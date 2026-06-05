@@ -1,4 +1,4 @@
-package com.be.mega.domain;
+package com.be.mega.common.domain;
 
 public enum ResultType {
     FAIL,SUCCESS

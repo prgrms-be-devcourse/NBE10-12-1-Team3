@@ -1,6 +1,6 @@
 package com.be.mega.common.apiResponse;
 
-import com.be.mega.domain.ResultType;
+import com.be.mega.common.domain.ResultType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.servlet.http.HttpServletResponse;
 

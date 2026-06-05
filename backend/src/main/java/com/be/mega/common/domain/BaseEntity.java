@@ -1,4 +1,4 @@
-package com.be.mega.domain;
+package com.be.mega.common.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
