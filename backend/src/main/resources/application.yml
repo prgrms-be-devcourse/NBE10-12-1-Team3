@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: mega
+
+  profiles:
+    active: dev  # 기본은 dev로 실행

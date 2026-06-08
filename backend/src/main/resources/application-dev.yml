@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:devdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true        # 브라우저에서 H2 콘솔 접근 가능
+      path: /h2-console    # 접속 주소: localhost:8080/h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # 실행할 때마다 테이블 새로 생성
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
