@@ -18,9 +18,14 @@ interface Props {
 }
 
 const STATUS_LABEL: Record<string, string> = {
+  // enum names (admin mock)
   READY: "발송전",
-  SHIPPED: "발송완료",
+  DELIVERED: "발송완료",
   CANCELLED: "취소됨",
+  // descriptions (user search API)
+  "발송 전": "발송전",
+  "발송 완료": "발송완료",
+  "발송 취소": "취소됨",
 };
 
 function formatDate(iso: string) {
@@ -121,7 +126,7 @@ export default function OrderTable({ orders, onSelectionChange, onItemChange }: 
                   >
                     {orderItem ? (
                       <div className="flex items-center justify-center gap-1">
-                        {order.postStatus === "READY" && (
+                        {STATUS_LABEL[order.postStatus] === "발송전" && (
                           <button
                             onClick={() =>
                               handleQtyChange(
@@ -138,7 +143,7 @@ export default function OrderTable({ orders, onSelectionChange, onItemChange }: 
                           </button>
                         )}
                         <span className="min-w-[1.5rem] text-center">{qty}</span>
-                        {order.postStatus === "READY" && (
+                        {STATUS_LABEL[order.postStatus] === "발송전" && (
                           <button
                             onClick={() =>
                               handleQtyChange(

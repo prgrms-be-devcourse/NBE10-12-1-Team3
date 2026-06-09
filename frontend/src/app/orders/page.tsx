@@ -3,7 +3,6 @@
 import { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import OrderTable, { ItemChangeRecord } from "@/components/common/OrderTable";
-import Pagination from "@/components/common/Pagination";
 import {
   searchOrders,
   deleteOrder,
@@ -19,7 +18,6 @@ import {
   STRING_ALREADY_SHIPPED,
 } from "@/lib/constants";
 
-const PAGE_SIZE = 5;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function toAdminOrder(order: Order): AdminOrder {
@@ -33,8 +31,6 @@ export default function OrdersPage() {
   const [emailError, setEmailError] = useState(false);
   const [searchState, setSearchState] = useState<SearchState>("idle");
   const [orders, setOrders] = useState<Order[]>([]);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
   const [itemChanges, setItemChanges] = useState<ItemChangeRecord[]>([]);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -42,10 +38,9 @@ export default function OrdersPage() {
   const [patchSuccessOpen, setPatchSuccessOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  async function fetchOrders(targetPage: number) {
-    const data = await searchOrders(email, targetPage - 1, PAGE_SIZE);
+  async function fetchOrders() {
+    const data = await searchOrders(email);
     setOrders(data.orders);
-    setTotalPages(data.totalPages);
     setSearchState(data.orders.length > 0 ? "results" : "empty");
   }
 
@@ -57,8 +52,7 @@ export default function OrdersPage() {
     setEmailError(false);
     setLoading(true);
     try {
-      await fetchOrders(1);
-      setPage(1);
+      await fetchOrders();
       setSelectedOrderId(null);
       setItemChanges([]);
     } finally {
@@ -72,7 +66,7 @@ export default function OrdersPage() {
     setSelectedOrderId(null);
     setItemChanges([]);
     setDeleteOpen(false);
-    await fetchOrders(page);
+    await fetchOrders();
   }
 
   async function handlePatch() {
@@ -89,18 +83,11 @@ export default function OrdersPage() {
         })),
       });
       setItemChanges([]);
-      await fetchOrders(page);
+      await fetchOrders();
       setPatchSuccessOpen(true);
     } catch {
       setShippedOpen(true);
     }
-  }
-
-  async function handlePageChange(newPage: number) {
-    setPage(newPage);
-    setSelectedOrderId(null);
-    setItemChanges([]);
-    await fetchOrders(newPage);
   }
 
   return (
@@ -145,13 +132,11 @@ export default function OrdersPage() {
       {searchState === "results" && (
         <>
           <OrderTable
-            key={page}
             orders={orders.map(toAdminOrder)}
             onSelectionChange={setSelectedOrderId}
             onItemChange={setItemChanges}
           />
-          <div className="mt-4 relative flex items-center justify-center">
-            <div className="absolute right-0 flex gap-2">
+          <div className="mt-4 flex justify-end gap-2">
               <Dialog.Root open={deleteOpen} onOpenChange={setDeleteOpen}>
                 <Dialog.Trigger asChild>
                   <button
@@ -191,13 +176,6 @@ export default function OrdersPage() {
               >
                 주문수정
               </button>
-            </div>
-
-            <Pagination
-              totalPages={totalPages}
-              currentPage={page}
-              onPageChange={handlePageChange}
-            />
           </div>
         </>
       )}

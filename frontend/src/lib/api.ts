@@ -71,14 +71,12 @@ export function postOrder(body: {
 }
 
 export function searchOrders(
-  email: string,
-  page: number,
-  size: number
-): Promise<{ orders: Order[]; totalPages: number; totalElements: number }> {
+  email: string
+): Promise<{ orders: Order[] }> {
   return request("/v1/orders/search", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, page, size }),
+    body: JSON.stringify({ email }),
   });
 }
 
