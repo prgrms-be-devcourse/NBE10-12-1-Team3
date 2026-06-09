@@ -1,6 +1,6 @@
 package com.be.mega.entity;
 
-import com.be.mega.enums.PostStatus;
+import com.be.mega.entity.enums.PostStatus;
 import com.be.mega.common.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;

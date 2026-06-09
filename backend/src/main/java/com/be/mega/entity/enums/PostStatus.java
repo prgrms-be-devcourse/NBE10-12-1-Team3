@@ -1,4 +1,4 @@
-package com.be.mega.enums;
+package com.be.mega.entity.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
