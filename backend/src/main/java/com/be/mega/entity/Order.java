@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 
 @Entity
-@Table(name = "orders")
+@Table(name = "orders", indexes = { @Index(name = "idx_orders_created_at", columnList = "created_at DESC")})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
