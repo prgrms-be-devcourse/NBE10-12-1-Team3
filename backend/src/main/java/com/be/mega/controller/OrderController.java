@@ -1,15 +1,14 @@
 package com.be.mega.controller;
 
 import com.be.mega.common.apiResponse.CustomApiResponse;
+import com.be.mega.dto.request.OrderItemUpdateRequest;
 import com.be.mega.dto.request.OrderSearchRequest;
+import com.be.mega.dto.response.OrderItemUpdateResponse;
 import com.be.mega.dto.response.OrderSearchResponse;
 import com.be.mega.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/v1/orders")
@@ -24,5 +23,12 @@ public class OrderController {
 
         return CustomApiResponse.success(response, 200 , "사용자 주문 전체 조회 성공");
 
+    }
+
+    @PatchMapping("/items")
+    public CustomApiResponse<OrderItemUpdateResponse> updateOrders(
+            @RequestBody OrderItemUpdateRequest request) {
+        OrderItemUpdateResponse response = orderService.updateOrders(request);
+        return CustomApiResponse.success(response, 200, "주문 수량이 변경되었습니다.");
     }
 }

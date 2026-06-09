@@ -51,4 +51,6 @@ public class Order extends BaseEntity {
         return this.deletedAt != null;
     }
 
+    public void updateTotalPrice(int totalPrice) { this.totalPrice = totalPrice; }
+
 }
