@@ -132,6 +132,7 @@ export const handlers = [
     const url = new URL(request.url);
     const page = Number(url.searchParams.get("page") ?? 0);
     const size = Number(url.searchParams.get("size") ?? 10);
+    const sort = url.searchParams.get("sort") ?? "createdAt";
     const postStatus = url.searchParams.get("postStatus");
     const email = url.searchParams.get("email");
     const orderNumber = url.searchParams.get("orderNumber");
@@ -140,6 +141,12 @@ export const handlers = [
     if (postStatus) filtered = filtered.filter((o) => o.postStatus.toLowerCase() === postStatus);
     if (email) filtered = filtered.filter((o) => (o.email ?? "").includes(email));
     if (orderNumber) filtered = filtered.filter((o) => String(o.orderNumber).includes(orderNumber));
+
+    if (sort === "orderNumber") {
+      filtered.sort((a, b) => b.orderNumber - a.orderNumber);
+    } else {
+      filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }
 
     const totalElements = filtered.length;
     const totalPages = Math.max(1, Math.ceil(totalElements / size));

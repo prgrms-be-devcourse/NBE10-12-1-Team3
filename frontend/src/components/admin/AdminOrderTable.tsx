@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { getAdminOrders, patchAdminOrderStatus, type AdminOrder } from "@/lib/api";
 import { BADGE_COLORS, PRODUCT_NAMES } from "@/lib/constants";
 import Pagination from "@/components/common/Pagination";
@@ -23,14 +24,17 @@ function isEmail(str: string): boolean {
 }
 
 export default function AdminOrderTable() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [totalElements, setTotalElements] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-  const [sort, setSort] = useState("desc");
-  const [postStatus, setPostStatus] = useState("");
-  const [keyword, setKeyword] = useState("");
-  const [searchInput, setSearchInput] = useState("");
-  const [page, setPage] = useState(1);
+  const [sort, setSort] = useState(() => searchParams.get("sort") ?? "");
+  const [postStatus, setPostStatus] = useState(() => searchParams.get("postStatus") ?? "");
+  const [keyword, setKeyword] = useState(() => searchParams.get("email") ?? searchParams.get("orderNumber") ?? "");
+  const [searchInput, setSearchInput] = useState(() => searchParams.get("email") ?? searchParams.get("orderNumber") ?? "");
+  const [page, setPage] = useState(() => Number(searchParams.get("page") ?? "1"));
   const [modalOpen, setModalOpen] = useState(false);
   const [modalResult, setModalResult] = useState<"none" | "success" | "failure">("success");
 
@@ -53,6 +57,19 @@ export default function AdminOrderTable() {
   }, [page, sort, postStatus, keyword]);
 
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (sort) params.set("sort", sort);
+    if (postStatus) params.set("postStatus", postStatus);
+    if (keyword) {
+      if (isEmail(keyword.trim())) params.set("email", keyword.trim());
+      else params.set("orderNumber", keyword.trim());
+    }
+    if (page > 1) params.set("page", String(page));
+    const query = params.toString();
+    router.replace(`/admin/orders${query ? `?${query}` : ""}`);
+  }, [sort, postStatus, keyword, page, router]);
 
   const totalByItem: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0 };
   for (const order of orders) {
@@ -84,15 +101,16 @@ export default function AdminOrderTable() {
           onChange={(e) => { setSort(e.target.value); setPage(1); }}
           className="border rounded-lg px-3 py-2 text-sm"
         >
-          <option value="desc">최신순</option>
-          <option value="asc">오래된순</option>
+          <option value="">정렬</option>
+          <option value="createdAt">날짜</option>
+          <option value="orderNumber">주문번호</option>
         </select>
         <select
           value={postStatus}
           onChange={(e) => { setPostStatus(e.target.value); setPage(1); }}
           className="border rounded-lg px-3 py-2 text-sm"
         >
-          <option value="">발송여부별</option>
+          <option value="">발송여부</option>
           <option value="ready">READY</option>
           <option value="shipped">SHIPPED</option>
           <option value="cancelled">CANCELLED</option>
@@ -105,7 +123,7 @@ export default function AdminOrderTable() {
             onKeyDown={(e) => {
               if (e.key === "Enter") { setKeyword(searchInput); setPage(1); }
             }}
-            placeholder="검색어"
+            placeholder="이메일 또는 주문번호"
             className="border rounded-lg px-3 py-2 text-sm w-56"
           />
           <button

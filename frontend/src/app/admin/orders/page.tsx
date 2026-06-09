@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import AdminOrderTable from "@/components/admin/AdminOrderTable";
 
@@ -26,7 +26,9 @@ export default function AdminOrdersPage() {
         <span className="text-sm text-muted-foreground">{email} 님</span>
       </div>
       <div className="px-8 py-2 flex-1">
-        <AdminOrderTable />
+        <Suspense>
+          <AdminOrderTable />
+        </Suspense>
       </div>
     </div>
   );
