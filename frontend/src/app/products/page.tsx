@@ -102,7 +102,7 @@ export default function ProductsPage() {
   }
 
   return (
-    <div className="min-h-screen p-6">
+    <div className="min-h-screen p-6 bg-stone-100">
       <div className="relative max-w-5xl mx-auto">
         <StoreHeader />
         {step === "step1" && (

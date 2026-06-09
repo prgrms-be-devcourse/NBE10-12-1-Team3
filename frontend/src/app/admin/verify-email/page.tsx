@@ -33,7 +33,7 @@ export default function AdminVerifyEmailPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gray-50">
+    <main className="min-h-screen flex items-center justify-center bg-stone-100">
       <div className="bg-white rounded-2xl shadow-lg p-10 w-full max-w-md">
         <h1 className="text-xl font-semibold mb-6 text-center">관리자 인증</h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">

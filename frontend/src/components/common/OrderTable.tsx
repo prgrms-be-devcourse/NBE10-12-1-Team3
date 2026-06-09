@@ -67,7 +67,7 @@ export default function OrderTable({ orders, onSelectionChange, onItemChange }: 
   }
 
   return (
-    <div className="w-full overflow-x-auto">
+    <div className="w-full overflow-x-auto bg-white rounded-lg">
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b text-left text-muted-foreground">

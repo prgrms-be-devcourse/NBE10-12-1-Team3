@@ -17,7 +17,7 @@ interface Props {
 export default function ShippingResultModal({ open, result, onClose }: Props) {
   const bgColor =
     result === "success"
-      ? "rgba(254, 240, 138, 0.8)"
+      ? "rgba(187, 247, 208, 0.9)"
       : result === "failure"
       ? "rgba(254, 202, 202, 0.8)"
       : "rgba(229, 231, 235, 0.9)";
@@ -30,6 +30,7 @@ export default function ShippingResultModal({ open, result, onClose }: Props) {
           className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-96 rounded-xl p-10 shadow-xl focus:outline-none"
           style={{ backgroundColor: bgColor }}
         >
+          <Dialog.Title className="sr-only">발송처리 결과</Dialog.Title>
           {result === "success" ? (
             <p className="text-center text-lg font-medium">{STRING_SHIPPING_SUCCESS}</p>
           ) : result === "failure" ? (

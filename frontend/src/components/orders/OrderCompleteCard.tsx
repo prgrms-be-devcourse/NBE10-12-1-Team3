@@ -23,13 +23,13 @@ export default function OrderCompleteCard() {
   if (!orderNumber) return null;
 
   return (
-    <div className="rounded-2xl shadow-lg flex items-center justify-center py-24 px-12">
+    <div className="rounded-2xl shadow-lg flex items-center justify-center py-24 px-12 bg-white">
       <div className="flex flex-col items-center gap-4 text-center">
         <p className="text-xl font-semibold">{STRING_ORDER_COMPLETE}</p>
         <p className="text-muted-foreground">주문번호: {orderNumber}</p>
         <button
           onClick={() => router.push("/products")}
-          className="mt-2 px-6 py-2 rounded-lg bg-primary text-primary-foreground text-sm hover:opacity-90"
+          className="mt-2 px-6 py-2 rounded-lg bg-amber-400 hover:bg-amber-500 text-white text-sm font-medium transition-colors"
         >
           처음으로
         </button>

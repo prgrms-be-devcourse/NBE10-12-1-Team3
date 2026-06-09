@@ -20,7 +20,7 @@ export default function AdminOrdersPage() {
   if (!email) return null;
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-stone-100">
       <div className="flex items-center justify-between px-8 py-4 border-b">
         <h1 className="text-lg font-semibold">Grid &amp; Circle 관리자 페이지</h1>
         <span className="text-sm text-muted-foreground">{email} 님</span>

@@ -99,7 +99,7 @@ export default function AdminOrderTable() {
         <select
           value={sort}
           onChange={(e) => { setSort(e.target.value); setPage(1); }}
-          className="border rounded-lg px-3 py-2 text-sm"
+          className="border rounded-lg px-3 py-2 text-sm bg-white"
         >
           <option value="">정렬</option>
           <option value="createdAt">날짜</option>
@@ -108,7 +108,7 @@ export default function AdminOrderTable() {
         <select
           value={postStatus}
           onChange={(e) => { setPostStatus(e.target.value); setPage(1); }}
-          className="border rounded-lg px-3 py-2 text-sm"
+          className="border rounded-lg px-3 py-2 text-sm bg-white"
         >
           <option value="">발송여부</option>
           <option value="ready">READY</option>
@@ -124,18 +124,18 @@ export default function AdminOrderTable() {
               if (e.key === "Enter") { setKeyword(searchInput); setPage(1); }
             }}
             placeholder="이메일 또는 주문번호"
-            className="border rounded-lg px-3 py-2 text-sm w-56"
+            className="border rounded-lg px-3 py-2 text-sm w-56 bg-white"
           />
           <button
             onClick={() => { setKeyword(searchInput); setPage(1); }}
-            className="border rounded-lg px-4 py-2 text-sm hover:bg-accent"
+            className="border rounded-lg px-4 py-2 text-sm bg-white hover:bg-accent"
           >
             검색
           </button>
         </div>
       </div>
 
-      <div className="w-full overflow-x-auto">
+      <div className="w-full overflow-x-auto bg-white rounded-lg">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-amber-50 border-b">

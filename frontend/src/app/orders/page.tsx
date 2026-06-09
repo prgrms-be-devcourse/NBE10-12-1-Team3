@@ -113,7 +113,7 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="min-h-screen p-8">
+    <div className="min-h-screen p-8 bg-stone-100">
       <h1 className="text-xl font-semibold mb-6">Grid & Circle 주문 조회</h1>
 
       <div className="mb-6">
@@ -129,7 +129,7 @@ export default function OrdersPage() {
                 setEmailError(false);
               }}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              className="border rounded-md px-3 py-1.5 text-sm w-64 focus:outline-none focus:ring-1 focus:ring-ring"
+              className="border rounded-md px-3 py-1.5 text-sm w-64 bg-white focus:outline-none focus:ring-1 focus:ring-ring"
             />
             {emailError && (
               <p className="mt-1 text-sm text-destructive">{STRING_INVALID_EMAIL}</p>
@@ -165,14 +165,14 @@ export default function OrdersPage() {
                 <Dialog.Trigger asChild>
                   <button
                     disabled={!selectedOrderId}
-                    className="px-4 py-1.5 rounded-md text-sm border hover:bg-accent disabled:opacity-40 disabled:pointer-events-none"
+                    className="px-4 py-1.5 rounded-md text-sm border bg-white hover:bg-accent disabled:opacity-40 disabled:pointer-events-none"
                   >
                     주문삭제
                   </button>
                 </Dialog.Trigger>
                 <Dialog.Portal>
                   <Dialog.Overlay className="fixed inset-0 bg-black/40 z-40" />
-                  <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background rounded-xl shadow-xl p-6 w-80 z-50">
+                  <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-xl p-6 w-80 z-50">
                     <Dialog.Title className="text-base font-semibold mb-6">
                       {STRING_DELETE_CONFIRM}
                     </Dialog.Title>
@@ -196,19 +196,17 @@ export default function OrdersPage() {
               <button
                 disabled={itemChanges.length === 0}
                 onClick={handlePatch}
-                className="px-4 py-1.5 rounded-md text-sm border hover:bg-accent disabled:opacity-40 disabled:pointer-events-none"
+                className="px-4 py-1.5 rounded-md text-sm border bg-white hover:bg-accent disabled:opacity-40 disabled:pointer-events-none"
               >
                 주문수정
               </button>
             </div>
 
-            {totalPages > 1 && (
-              <Pagination
-                totalPages={totalPages}
-                currentPage={page}
-                onPageChange={handlePageChange}
-              />
-            )}
+            <Pagination
+              totalPages={totalPages}
+              currentPage={page}
+              onPageChange={handlePageChange}
+            />
           </div>
         </>
       )}
@@ -216,7 +214,7 @@ export default function OrdersPage() {
       <Dialog.Root open={patchSuccessOpen} onOpenChange={setPatchSuccessOpen}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/40 z-40" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background rounded-xl shadow-xl p-6 w-80 z-50">
+          <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-xl p-6 w-80 z-50">
             <Dialog.Title className="text-base font-semibold mb-6">
               주문이 수정되었습니다.
             </Dialog.Title>
@@ -234,7 +232,7 @@ export default function OrdersPage() {
       <Dialog.Root open={shippedOpen} onOpenChange={setShippedOpen}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 bg-black/40 z-40" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background rounded-xl shadow-xl p-6 w-80 z-50">
+          <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-xl p-6 w-80 z-50">
             <Dialog.Title className="text-base font-semibold mb-6">
               {STRING_ALREADY_SHIPPED}
             </Dialog.Title>
