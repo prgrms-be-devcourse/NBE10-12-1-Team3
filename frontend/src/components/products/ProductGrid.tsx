@@ -33,8 +33,10 @@ export default function ProductGrid({
               onClick={() => onAddToCart(product)}
               onMouseEnter={() => onHover(product)}
               onMouseLeave={() => onHover(null)}
-              className={`rounded-xl border p-3 cursor-pointer transition-all duration-200 hover:scale-105 hover:shadow-md ${
-                inCart ? "border-blue-500 ring-1 ring-blue-500" : "border-border"
+              className={`rounded-xl border p-3 cursor-pointer transition-all duration-200 hover:shadow-lg ${
+                inCart
+                  ? "border-blue-500 ring-1 ring-blue-500 hover:border-blue-400"
+                  : "border-border hover:border-blue-300"
               }`}
             >
               <img
