@@ -145,7 +145,12 @@ export const handlers = [
     const totalPages = Math.max(1, Math.ceil(totalElements / size));
     const orders = filtered.slice(page * size, (page + 1) * size);
 
-    return HttpResponse.json({ orders, totalElements, totalPages });
+    return HttpResponse.json({
+      statusCode: 200,
+      resultType: "SUCCESS",
+      data: { orders, totalElements, totalPages },
+      message: "조회 성공",
+    });
   }),
 
   http.patch("/v1/admin/orders/status", () => {

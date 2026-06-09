@@ -48,8 +48,8 @@ export default function AdminOrderTable() {
     }
     const data = await getAdminOrders(params);
     setOrders(data.orders);
-    setTotalElements(data.totalElements ?? data.orders.length);
-    setTotalPages(data.totalPages ?? 1);
+    setTotalElements(data.totalElements);
+    setTotalPages(data.totalPages);
   }, [page, sort, postStatus, keyword]);
 
   useEffect(() => { fetchOrders(); }, [fetchOrders]);

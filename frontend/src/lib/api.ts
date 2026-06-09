@@ -35,8 +35,10 @@ async function request<T>(
 ): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, options);
   if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-  if (res.status === 204) return undefined as T;
-  return res.json();
+  const text = await res.text();
+  if (!text) return undefined as T;
+  const json = JSON.parse(text);
+  return (json?.data !== undefined ? json.data : json) as T;
 }
 
 export function getProducts(): Promise<{
