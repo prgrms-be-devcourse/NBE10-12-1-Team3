@@ -1,5 +1,6 @@
 package com.be.mega.controller;
 
+import com.be.mega.dto.response.ShowDetailProductResponse;
 import com.be.mega.service.ProductService;
 import com.be.mega.common.apiResponse.CustomApiResponse;
 import com.be.mega.dto.response.ShowProductResponse;
@@ -7,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,4 +26,14 @@ public class ProductController {
         ShowProductResponse response = productService.getProducts();
         return CustomApiResponse.success(response, 200, "상품 조회 완료");
     }
+
+    @Operation(summary = "상품 상세 설명 표시")
+    @GetMapping("/{productId}")
+    public CustomApiResponse<ShowDetailProductResponse> getDetailProduct(
+            @PathVariable Long productId
+    ) {
+        ShowDetailProductResponse response = productService.getDetailProduct(productId);
+        return CustomApiResponse.success(response, 200, "개별 상품 상세내용 조회 완료");
+    }
 }
+
