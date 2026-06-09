@@ -17,11 +17,11 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
 
+    @Transactional(readOnly = true)
     public OrderSearchResponse getOrdersByEmail(String email) {
         List<Order> orders = orderRepository.findByEmail(email);
 
@@ -37,15 +37,9 @@ public class OrderService {
 
 
         Map<Long, List<OrderItem>> itemMap = allItems.stream()
-                .collect(Collectors.groupingBy(oi -> oi.getOrder().getId()));
+                .collect(Collectors.groupingBy(orderitem -> orderitem.getOrder().getId()));
 
-        List<OrderSearchResponse.OrderResponse> orderResponses = orders.stream()
-                .map(order -> OrderSearchResponse.OrderResponse.from(
-                        order,
-                        itemMap.getOrDefault(order.getId(), List.of())
-                ))
-                .toList();
 
-        return new OrderSearchResponse(orderResponses);
+        return OrderSearchResponse.from(orders, itemMap);
     }
 }
