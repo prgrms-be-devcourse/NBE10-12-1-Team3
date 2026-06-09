@@ -24,7 +24,7 @@ export default function AdminVerifyEmailPage() {
     }
 
     try {
-      await postAdminVerifyEmail(email);
+      // await postAdminVerifyEmail(email);
       sessionStorage.setItem("adminEmail", email);
       router.push("/admin/orders");
     } catch {

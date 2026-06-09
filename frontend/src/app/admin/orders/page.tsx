@@ -1,16 +1,23 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import AdminOrderTable from "@/components/admin/AdminOrderTable";
-import { ADMIN_EMAIL } from "@/lib/constants";
 
 export default function AdminOrdersPage() {
-  const [email, setEmail] = useState(ADMIN_EMAIL);
+  const router = useRouter();
+  const [email, setEmail] = useState<string | null>(null);
 
   useEffect(() => {
     const stored = sessionStorage.getItem("adminEmail");
-    if (stored) setEmail(stored);
-  }, []);
+    if (!stored) {
+      router.replace("/admin/verify-email");
+    } else {
+      setEmail(stored);
+    }
+  }, [router]);
+
+  if (!email) return null;
 
   return (
     <div className="min-h-screen flex flex-col">

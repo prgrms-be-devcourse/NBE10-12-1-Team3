@@ -9,7 +9,7 @@ import ProductGrid from "@/components/products/ProductGrid";
 import CartSummary from "@/components/products/CartSummary";
 import OrderList from "@/components/products/OrderList";
 import CheckoutForm from "@/components/products/CheckoutForm";
-import { /* getProducts, */ postOrder } from "@/lib/api";
+import { /* getProducts, postOrder */ } from "@/lib/api"; // TODO: API 연결 시 getProducts, postOrder 주석 해제
 import { mockProducts } from "@/lib/mockProducts";
 
 export interface Product {
@@ -43,6 +43,7 @@ export default function ProductsPage() {
 
   useEffect(() => {
     setCart(loadCart());
+    // TODO: API 연결 시 아래 주석 해제하고 mockProducts 줄 삭제
     // getProducts().then((data) => setProducts(data.items));
     setProducts(mockProducts.items);
   }, []);
@@ -90,14 +91,16 @@ export default function ProductsPage() {
     address: string;
     postalAddress: string;
   }) {
-    const result = await postOrder({
-      info,
-      orders: cart.map((i) => ({
-        productId: i.product.productId,
-        quantity: i.quantity,
-      })),
-      totalPrice,
-    });
+    // TODO: API 연결 시 아래 주석 해제하고 mock result 줄 삭제
+    // const result = await postOrder({
+    //   info,
+    //   orders: cart.map((i) => ({
+    //     productId: i.product.productId,
+    //     quantity: i.quantity,
+    //   })),
+    //   totalPrice,
+    // });
+    const result = { orderNumber: Date.now() };
     sessionStorage.removeItem(CART_KEY);
     setCart([]);
     router.push(`/orders/complete?orderNumber=${result.orderNumber}`);
