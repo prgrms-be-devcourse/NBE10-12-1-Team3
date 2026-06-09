@@ -55,10 +55,12 @@ export default function OrderTable({ orders, onSelectionChange, onItemChange }: 
     const key = `${orderId}-${itemId}`;
     const next = Math.max(0, getQty(orderId, itemId, originalQty) + delta);
     const nextLocalQty = { ...localQty, [key]: next };
-    const nextChanges = {
-      ...changesMap,
-      [key]: { orderId, orderItemId, itemId, quantity: next },
-    };
+    const nextChanges = { ...changesMap };
+    if (next === originalQty) {
+      delete nextChanges[key];
+    } else {
+      nextChanges[key] = { orderId, orderItemId, itemId, quantity: next };
+    }
     setLocalQty(nextLocalQty);
     setChangesMap(nextChanges);
     onItemChange?.(Object.values(nextChanges));
@@ -69,7 +71,6 @@ export default function OrderTable({ orders, onSelectionChange, onItemChange }: 
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b text-left text-muted-foreground">
-            <th className="p-2 w-8" />
             <th className="p-2">발송여부</th>
             <th className="p-2">주문번호</th>
             <th className="p-2 whitespace-nowrap">날짜</th>
@@ -84,17 +85,13 @@ export default function OrderTable({ orders, onSelectionChange, onItemChange }: 
           {orders.map((order) => (
             <tr
               key={order.orderId}
-              className={`border-b hover:bg-muted/40 transition-colors ${
-                selectedId === order.orderId ? "bg-muted/60" : ""
+              onClick={() => handleSelect(order.orderId)}
+              className={`border-b border-l-2 cursor-pointer transition-colors ${
+                selectedId === order.orderId
+                  ? "border-l-black bg-neutral-100"
+                  : "border-l-transparent hover:bg-muted/40"
               }`}
             >
-              <td className="p-2">
-                <input
-                  type="checkbox"
-                  checked={selectedId === order.orderId}
-                  onChange={() => handleSelect(order.orderId)}
-                />
-              </td>
               <td className="p-2">
                 <span
                   className={`px-2 py-0.5 rounded-full text-xs text-white ${
@@ -117,6 +114,7 @@ export default function OrderTable({ orders, onSelectionChange, onItemChange }: 
                 return (
                   <td
                     key={itemId}
+                    onClick={(e) => e.stopPropagation()}
                     className={`p-2 text-center transition-all ${
                       changed ? "font-bold bg-yellow-50 ring-1 ring-yellow-300" : ""
                     }`}

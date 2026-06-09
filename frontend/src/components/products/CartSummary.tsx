@@ -47,7 +47,7 @@ export default function CartSummary({
           <button
             onClick={onProceed}
             disabled={cart.length === 0}
-            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm disabled:opacity-40"
+            className="px-5 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-neutral-800 transition-colors disabled:opacity-40"
           >
             선택완료
           </button>

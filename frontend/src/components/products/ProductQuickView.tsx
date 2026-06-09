@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getProductDetail } from "@/lib/api";
+// TODO: API 연결 시 아래 주석 해제하고 mockProductDetails import 삭제
+// import { getProductDetail } from "@/lib/api";
+import { mockProductDetails } from "@/lib/mockProducts";
 
 interface Props {
   productId: number;
@@ -15,7 +17,9 @@ export default function ProductQuickView({ productId }: Props) {
 
   useEffect(() => {
     setDetail(null);
-    getProductDetail(productId).then(setDetail);
+    // TODO: API 연결 시 아래 두 줄을 getProductDetail(productId).then(setDetail); 로 교체
+    const mock = mockProductDetails[productId] ?? null;
+    setDetail(mock);
   }, [productId]);
 
   return (

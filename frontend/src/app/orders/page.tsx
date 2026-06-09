@@ -5,12 +5,13 @@ import * as Dialog from "@radix-ui/react-dialog";
 import OrderTable, { ItemChangeRecord } from "@/components/common/OrderTable";
 import Pagination from "@/components/common/Pagination";
 import {
-  searchOrders,
-  deleteOrder,
-  patchOrderItems,
+  // searchOrders, // TODO: API 연결 시 주석 해제
+  // deleteOrder,  // TODO: API 연결 시 주석 해제
+  // patchOrderItems, // TODO: API 연결 시 주석 해제
   type Order,
   type AdminOrder,
 } from "@/lib/api";
+import { mockOrders } from "@/lib/mockOrders"; // TODO: API 연결 시 삭제
 import {
   STRING_ORDERS_BEFORE_SEARCH,
   STRING_ORDERS_NO_RESULT,
@@ -38,6 +39,7 @@ export default function OrdersPage() {
   const [itemChanges, setItemChanges] = useState<ItemChangeRecord[]>([]);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [shippedOpen, setShippedOpen] = useState(false);
+  const [patchSuccessOpen, setPatchSuccessOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const totalPages = Math.ceil(orders.length / PAGE_SIZE);
@@ -63,7 +65,9 @@ export default function OrdersPage() {
     setEmailError(false);
     setLoading(true);
     try {
-      const data = await searchOrders(email);
+      // TODO: API 연결 시 아래 두 줄을 searchOrders(email) 호출로 교체
+      const filtered = mockOrders.filter((o) => o.email === email);
+      const data = { orders: filtered.map(({ deletedAt: _d, ...rest }) => rest as Order) };
       setOrders(data.orders);
       setSearchState(data.orders.length > 0 ? "results" : "empty");
       setPage(1);
@@ -76,7 +80,8 @@ export default function OrdersPage() {
 
   async function handleDelete() {
     if (!selectedOrderId) return;
-    await deleteOrder(selectedOrderId);
+    // TODO: API 연결 시 아래 주석 해제
+    // await deleteOrder(selectedOrderId);
     setOrders((prev) => prev.filter((o) => o.orderId !== selectedOrderId));
     setSelectedOrderId(null);
     setItemChanges([]);
@@ -84,25 +89,20 @@ export default function OrdersPage() {
   }
 
   async function handlePatch() {
-    const grouped: Record<number, ItemChangeRecord[]> = {};
-    for (const c of itemChanges) {
-      if (!grouped[c.orderId]) grouped[c.orderId] = [];
-      grouped[c.orderId].push(c);
-    }
+    // TODO: API 연결 시 아래 주석 해제하고 mock 처리 삭제
+    // const grouped: Record<number, ItemChangeRecord[]> = {};
+    // for (const c of itemChanges) {
+    //   if (!grouped[c.orderId]) grouped[c.orderId] = [];
+    //   grouped[c.orderId].push(c);
+    // }
     try {
-      await patchOrderItems({
-        orders: Object.entries(grouped).map(([orderId, changes]) => ({
-          orderId: Number(orderId),
-          orderItems: changes.map((c) => ({
-            orderItemId: c.orderItemId,
-            itemId: c.itemId,
-            quantity: c.quantity,
-          })),
-        })),
-      });
+      // await patchOrderItems({ orders: Object.entries(grouped).map(...) });
       setItemChanges([]);
-      const data = await searchOrders(email);
+      // TODO: API 연결 시 아래 두 줄을 searchOrders(email) 호출로 교체
+      const filtered = mockOrders.filter((o) => o.email === email);
+      const data = { orders: filtered.map(({ deletedAt: _d, ...rest }) => rest as Order) };
       setOrders(data.orders);
+      setPatchSuccessOpen(true);
     } catch {
       setShippedOpen(true);
     }
@@ -119,11 +119,12 @@ export default function OrdersPage() {
       <h1 className="text-xl font-semibold mb-6">Grid & Circle 주문 조회</h1>
 
       <div className="mb-6">
-        <div className="flex items-start gap-2">
+        <div className="flex items-start gap-4">
           <label className="text-sm mt-1.5 whitespace-nowrap">사용자 이메일</label>
           <div className="flex flex-col">
             <input
               type="text"
+              placeholder="이메일을 입력하세요"
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
@@ -139,7 +140,7 @@ export default function OrdersPage() {
           <button
             onClick={handleSearch}
             disabled={loading}
-            className="px-4 py-1.5 rounded-md bg-primary text-primary-foreground text-sm hover:opacity-90 disabled:opacity-50"
+            className="px-4 py-1.5 rounded-lg bg-black text-white text-sm font-medium hover:bg-neutral-800 transition-colors disabled:opacity-50"
           >
             조회
           </button>
@@ -213,6 +214,24 @@ export default function OrdersPage() {
           </div>
         </>
       )}
+
+      <Dialog.Root open={patchSuccessOpen} onOpenChange={setPatchSuccessOpen}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 bg-black/40 z-40" />
+          <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-background rounded-xl shadow-xl p-6 w-80 z-50">
+            <Dialog.Title className="text-base font-semibold mb-6">
+              주문이 수정되었습니다.
+            </Dialog.Title>
+            <div className="flex justify-end">
+              <Dialog.Close asChild>
+                <button className="px-4 py-1.5 rounded-md text-sm border hover:bg-accent">
+                  확인
+                </button>
+              </Dialog.Close>
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
 
       <Dialog.Root open={shippedOpen} onOpenChange={setShippedOpen}>
         <Dialog.Portal>

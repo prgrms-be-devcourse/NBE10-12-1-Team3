@@ -12,7 +12,7 @@ export default function OrderList({ cart, onBack }: Props) {
         <h2 className="text-lg font-semibold">상품 목록</h2>
         <button
           onClick={onBack}
-          className="text-sm text-muted-foreground hover:underline"
+          className="px-4 py-1.5 bg-black text-white text-xs font-medium rounded-lg hover:bg-neutral-800 transition-colors"
         >
           목록으로 돌아가기
         </button>

@@ -108,18 +108,20 @@ export default function ProductsPage() {
 
   return (
     <div className="min-h-screen p-6">
-      <StoreHeader />
       <div className="relative max-w-5xl mx-auto">
+        <StoreHeader />
         {step === "step1" && (
-          <div className="absolute right-0 -top-8">
+          <div className="absolute right-0 inset-y-0 flex items-center">
             <Link
               href="/orders"
-              className="text-sm text-muted-foreground hover:underline"
+              className="px-4 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-neutral-800 transition-colors"
             >
               비회원 주문조회
             </Link>
           </div>
         )}
+      </div>
+      <div className="max-w-5xl mx-auto">
         <MainCard
           left={
             step === "step1" ? (

@@ -20,6 +20,7 @@ export const STRING_ALREADY_SHIPPED = "이미 발송처리된 주문입니다";
 export const STRING_DELETE_CONFIRM = "정말 삭제하시겠습니까";
 export const STRING_ADMIN_INVALID_EMAIL = "이메일 형식이 일치하지 않습니다";
 export const STRING_ADMIN_NO_ACCOUNT = "계정이 없거나 틀립니다";
+export const STRING_SHIPPING_NONE = "처리할 주문이 없습니다.";
 export const STRING_SHIPPING_SUCCESS = "발송 처리가 완료되었습니다.";
 export const STRING_SHIPPING_FAIL_TITLE = "발송 처리에 실패했습니다";
 export const STRING_SHIPPING_FAIL_DESC = "잠시 후 다시 시도해 주세요.";

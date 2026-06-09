@@ -3,50 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { /* getAdminOrders, */ patchAdminOrderStatus, type AdminOrder } from "@/lib/api"; // TODO: API 연결 시 getAdminOrders 주석 해제
 
-// TODO: API 연결 시 아래 mockOrders 블록 전체 삭제
-const mockOrders: AdminOrder[] = [
-  {
-    orderId: 1,
-    createdAt: "2026-06-09T10:00:00",
-    updatedAt: "2026-06-09T10:00:00",
-    deletedAt: null,
-    postStatus: "READY",
-    orderNumber: 20260609001,
-    email: "user1@example.com",
-    totalPrice: 33000,
-    orderItems: [
-      { orderItemId: 1, itemId: 1, quantity: 1 },
-      { orderItemId: 2, itemId: 2, quantity: 1 },
-    ],
-  },
-  {
-    orderId: 2,
-    createdAt: "2026-06-09T11:30:00",
-    updatedAt: "2026-06-09T12:00:00",
-    deletedAt: null,
-    postStatus: "SHIPPED",
-    orderNumber: 20260609002,
-    email: "user2@example.com",
-    totalPrice: 80000,
-    orderItems: [
-      { orderItemId: 3, itemId: 3, quantity: 1 },
-      { orderItemId: 4, itemId: 4, quantity: 1 },
-    ],
-  },
-  {
-    orderId: 3,
-    createdAt: "2026-06-09T13:00:00",
-    updatedAt: "2026-06-09T13:00:00",
-    deletedAt: null,
-    postStatus: "CANCELLED",
-    orderNumber: 20260609003,
-    email: "user3@example.com",
-    totalPrice: 48000,
-    orderItems: [
-      { orderItemId: 5, itemId: 4, quantity: 1 },
-    ],
-  },
-];
+import { mockOrders } from "@/lib/mockOrders"; // TODO: API 연결 시 삭제
 import { BADGE_COLORS, PRODUCT_NAMES } from "@/lib/constants";
 import Pagination from "@/components/common/Pagination";
 import ShippingResultModal from "./ShippingResultModal";
@@ -72,10 +29,8 @@ export default function AdminOrderTable() {
   const [keyword, setKeyword] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [page, setPage] = useState(1);
-  const [selectedId, setSelectedId] = useState<number | null>(null);
-  const [localQty, setLocalQty] = useState<Record<string, number>>({});
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalSuccess, setModalSuccess] = useState(false);
+  const [modalResult, setModalResult] = useState<"none" | "success" | "failure">("success");
 
   const fetchOrders = useCallback(async () => {
     // TODO: API 연결 시 아래 5줄 주석 해제하고 mockOrders 줄 삭제
@@ -86,8 +41,6 @@ export default function AdminOrderTable() {
     // setOrders(data.orders);
     setOrders(mockOrders);
     setPage(1);
-    setSelectedId(null);
-    setLocalQty({});
   }, [sort, postStatus, keyword]);
 
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
@@ -102,23 +55,12 @@ export default function AdminOrderTable() {
     }
   }
 
-  function getQty(orderId: number, itemId: number, original: number) {
-    const key = `${orderId}-${itemId}`;
-    return key in localQty ? localQty[key] : original;
-  }
-
-  function handleQtyChange(orderId: number, itemId: number, original: number, delta: number) {
-    const key = `${orderId}-${itemId}`;
-    const next = Math.max(0, getQty(orderId, itemId, original) + delta);
-    setLocalQty((prev) => ({ ...prev, [key]: next }));
-  }
-
   async function handleShipping() {
     try {
       await patchAdminOrderStatus();
-      setModalSuccess(true);
+      setModalResult("success");
     } catch {
-      setModalSuccess(false);
+      setModalResult("failure");
     }
     setModalOpen(true);
   }
@@ -182,7 +124,6 @@ export default function AdminOrderTable() {
               <th className="p-2" />
             </tr>
             <tr className="border-b text-left text-muted-foreground">
-              <th className="p-2 w-8" />
               <th className="p-2">발송여부</th>
               <th className="p-2">주문번호</th>
               <th className="p-2 whitespace-nowrap">날짜</th>
@@ -197,19 +138,8 @@ export default function AdminOrderTable() {
             {pageOrders.map((order) => (
               <tr
                 key={order.orderId}
-                className={`border-b hover:bg-muted/40 transition-colors ${
-                  selectedId === order.orderId ? "bg-muted/60" : ""
-                }`}
+                className="border-b hover:bg-muted/40 transition-colors"
               >
-                <td className="p-2">
-                  <input
-                    type="checkbox"
-                    checked={selectedId === order.orderId}
-                    onChange={() =>
-                      setSelectedId(selectedId === order.orderId ? null : order.orderId)
-                    }
-                  />
-                </td>
                 <td className="p-2">
                   <span
                     className={`px-2 py-0.5 rounded-full text-xs text-white ${
@@ -224,44 +154,9 @@ export default function AdminOrderTable() {
                 <td className="p-2">{order.email}</td>
                 {[1, 2, 3, 4].map((itemId) => {
                   const orderItem = order.orderItems.find((i) => i.itemId === itemId);
-                  const qty = orderItem
-                    ? getQty(order.orderId, itemId, orderItem.quantity)
-                    : null;
-                  const changed = orderItem && `${order.orderId}-${itemId}` in localQty;
                   return (
-                    <td
-                      key={itemId}
-                      className={`p-2 text-center transition-all ${
-                        changed ? "font-bold bg-yellow-50 ring-1 ring-yellow-300" : ""
-                      }`}
-                    >
-                      {orderItem ? (
-                        <div className="flex items-center justify-center gap-1">
-                          {order.postStatus === "READY" && (
-                            <button
-                              onClick={() =>
-                                handleQtyChange(order.orderId, itemId, orderItem.quantity, -1)
-                              }
-                              className="w-5 h-5 rounded text-xs border hover:bg-muted leading-none"
-                            >
-                              -
-                            </button>
-                          )}
-                          <span className="min-w-[1.5rem] text-center">{qty}</span>
-                          {order.postStatus === "READY" && (
-                            <button
-                              onClick={() =>
-                                handleQtyChange(order.orderId, itemId, orderItem.quantity, 1)
-                              }
-                              className="w-5 h-5 rounded text-xs border hover:bg-muted leading-none"
-                            >
-                              +
-                            </button>
-                          )}
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
+                    <td key={itemId} className="p-2 text-center">
+                      {orderItem ? orderItem.quantity : <span className="text-muted-foreground">-</span>}
                     </td>
                   );
                 })}
@@ -281,9 +176,8 @@ export default function AdminOrderTable() {
         />
         <div className="flex-1 flex justify-end">
           <button
-            disabled={selectedId === null}
             onClick={handleShipping}
-            className="px-4 py-2 rounded-lg bg-amber-400 text-white text-sm font-medium hover:bg-amber-500 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+            className="px-4 py-2 rounded-lg bg-amber-400 text-white text-sm font-medium hover:bg-amber-500 transition-colors"
           >
             발송처리
           </button>
@@ -292,7 +186,7 @@ export default function AdminOrderTable() {
 
       <ShippingResultModal
         open={modalOpen}
-        success={modalSuccess}
+        result={modalResult}
         onClose={handleModalClose}
       />
     </div>

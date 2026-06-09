@@ -14,11 +14,32 @@ interface Props {
   }) => Promise<void>;
 }
 
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
 export default function CheckoutForm({ cart, totalPrice, onCheckout }: Props) {
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
   const [postalAddress, setPostalAddress] = useState("");
+  const [touched, setTouched] = useState({ email: false, address: false, postalAddress: false });
   const [loading, setLoading] = useState(false);
+
+  const emailError = touched.email && email.length > 0 && !isValidEmail(email)
+    ? "이메일 형식이 올바르지 않습니다." : "";
+  const addressError = touched.address && address.length === 0
+    ? "주소를 입력해주세요." : "";
+  const postalError = touched.postalAddress && postalAddress.length > 0 && !/^\d{5}$/.test(postalAddress)
+    ? "숫자 5자리로 입력해주세요." : "";
+
+  const isValid =
+    isValidEmail(email) &&
+    address.length > 0 &&
+    /^\d{5}$/.test(postalAddress);
+
+  function blur(field: keyof typeof touched) {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+  }
 
   async function handleSubmit() {
     setLoading(true);
@@ -29,8 +50,9 @@ export default function CheckoutForm({ cart, totalPrice, onCheckout }: Props) {
     }
   }
 
-  const inputClass =
+  const inputBase =
     "w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring";
+  const inputError = "border-red-400 focus:ring-red-400";
 
   return (
     <div className="p-6 flex flex-col h-full">
@@ -47,41 +69,54 @@ export default function CheckoutForm({ cart, totalPrice, onCheckout }: Props) {
           </div>
         ))}
       </div>
-      <div className="space-y-2 flex-1">
-        <input
-          type="email"
-          placeholder="이메일"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className={inputClass}
-        />
-        <input
-          type="text"
-          placeholder="주소"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          className={inputClass}
-        />
-        <input
-          type="text"
-          placeholder="우편번호"
-          value={postalAddress}
-          onChange={(e) => setPostalAddress(e.target.value)}
-          className={inputClass}
-        />
+      <div className="flex-1 space-y-1">
+        <div>
+          <input
+            type="email"
+            placeholder="이메일"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onBlur={() => blur("email")}
+            className={`${inputBase} ${emailError ? inputError : ""}`}
+          />
+          {emailError && <p className="mt-1 text-xs text-red-500">{emailError}</p>}
+        </div>
+        <div>
+          <input
+            type="text"
+            placeholder="주소"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            onBlur={() => blur("address")}
+            className={`${inputBase} ${addressError ? inputError : ""}`}
+          />
+          {addressError && <p className="mt-1 text-xs text-red-500">{addressError}</p>}
+        </div>
+        <div>
+          <input
+            type="text"
+            placeholder="우편번호"
+            value={postalAddress}
+            onChange={(e) => setPostalAddress(e.target.value)}
+            onBlur={() => blur("postalAddress")}
+            className={`${inputBase} ${postalError ? inputError : ""}`}
+          />
+          {postalError && <p className="mt-1 text-xs text-red-500">{postalError}</p>}
+        </div>
       </div>
       <div className="mt-4 pt-4 border-t shrink-0">
-        <p className="text-xs text-muted-foreground mb-2">{STRING_B}</p>
-        <div className="flex items-center justify-between">
+        <p className="text-xs text-muted-foreground mb-3">{STRING_B}</p>
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-sm text-muted-foreground">총 금액</span>
           <span className="font-semibold">{totalPrice.toLocaleString()}원</span>
-          <button
-            onClick={handleSubmit}
-            disabled={loading || !email || !address || !postalAddress}
-            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm disabled:opacity-40"
-          >
-            {loading ? "처리중..." : "결제하기"}
-          </button>
         </div>
+        <button
+          onClick={handleSubmit}
+          disabled={loading || !isValid}
+          className="w-full py-2.5 bg-black text-white text-sm font-medium rounded-lg hover:bg-neutral-800 transition-colors disabled:opacity-40"
+        >
+          {loading ? "처리중..." : "결제하기"}
+        </button>
       </div>
     </div>
   );
