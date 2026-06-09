@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { /* getAdminOrders, */ patchAdminOrderStatus, type AdminOrder } from "@/lib/api"; // TODO: API 연결 시 getAdminOrders 주석 해제
-
-import { mockOrders } from "@/lib/mockOrders"; // TODO: API 연결 시 삭제
+import { getAdminOrders, patchAdminOrderStatus, type AdminOrder } from "@/lib/api";
 import { BADGE_COLORS, PRODUCT_NAMES } from "@/lib/constants";
 import Pagination from "@/components/common/Pagination";
 import ShippingResultModal from "./ShippingResultModal";
@@ -33,13 +31,11 @@ export default function AdminOrderTable() {
   const [modalResult, setModalResult] = useState<"none" | "success" | "failure">("success");
 
   const fetchOrders = useCallback(async () => {
-    // TODO: API 연결 시 아래 5줄 주석 해제하고 mockOrders 줄 삭제
-    // const params: { sort?: string; postStatus?: string; keyword?: string } = { sort };
-    // if (postStatus) params.postStatus = postStatus;
-    // if (keyword) params.keyword = keyword;
-    // const data = await getAdminOrders(params);
-    // setOrders(data.orders);
-    setOrders(mockOrders);
+    const params: { sort?: string; postStatus?: string; keyword?: string } = { sort };
+    if (postStatus) params.postStatus = postStatus;
+    if (keyword) params.keyword = keyword;
+    const data = await getAdminOrders(params);
+    setOrders(data.orders);
     setPage(1);
   }, [sort, postStatus, keyword]);
 

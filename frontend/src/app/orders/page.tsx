@@ -5,13 +5,12 @@ import * as Dialog from "@radix-ui/react-dialog";
 import OrderTable, { ItemChangeRecord } from "@/components/common/OrderTable";
 import Pagination from "@/components/common/Pagination";
 import {
-  // searchOrders, // TODO: API 연결 시 주석 해제
-  // deleteOrder,  // TODO: API 연결 시 주석 해제
-  // patchOrderItems, // TODO: API 연결 시 주석 해제
+  searchOrders,
+  deleteOrder,
+  patchOrderItems,
   type Order,
   type AdminOrder,
 } from "@/lib/api";
-import { mockOrders } from "@/lib/mockOrders"; // TODO: API 연결 시 삭제
 import {
   STRING_ORDERS_BEFORE_SEARCH,
   STRING_ORDERS_NO_RESULT,
@@ -65,9 +64,7 @@ export default function OrdersPage() {
     setEmailError(false);
     setLoading(true);
     try {
-      // TODO: API 연결 시 아래 두 줄을 searchOrders(email) 호출로 교체
-      const filtered = mockOrders.filter((o) => o.email === email);
-      const data = { orders: filtered.map(({ deletedAt: _d, ...rest }) => rest as Order) };
+      const data = await searchOrders(email);
       setOrders(data.orders);
       setSearchState(data.orders.length > 0 ? "results" : "empty");
       setPage(1);
@@ -80,8 +77,7 @@ export default function OrdersPage() {
 
   async function handleDelete() {
     if (!selectedOrderId) return;
-    // TODO: API 연결 시 아래 주석 해제
-    // await deleteOrder(selectedOrderId);
+    await deleteOrder(selectedOrderId);
     setOrders((prev) => prev.filter((o) => o.orderId !== selectedOrderId));
     setSelectedOrderId(null);
     setItemChanges([]);
@@ -89,18 +85,20 @@ export default function OrdersPage() {
   }
 
   async function handlePatch() {
-    // TODO: API 연결 시 아래 주석 해제하고 mock 처리 삭제
-    // const grouped: Record<number, ItemChangeRecord[]> = {};
-    // for (const c of itemChanges) {
-    //   if (!grouped[c.orderId]) grouped[c.orderId] = [];
-    //   grouped[c.orderId].push(c);
-    // }
+    const grouped: Record<number, ItemChangeRecord[]> = {};
+    for (const c of itemChanges) {
+      if (!grouped[c.orderId]) grouped[c.orderId] = [];
+      grouped[c.orderId].push(c);
+    }
     try {
-      // await patchOrderItems({ orders: Object.entries(grouped).map(...) });
+      await patchOrderItems({
+        orders: Object.entries(grouped).map(([orderId, items]) => ({
+          orderId: Number(orderId),
+          orderItems: items.map(({ orderItemId, itemId, quantity }) => ({ orderItemId, itemId, quantity })),
+        })),
+      });
       setItemChanges([]);
-      // TODO: API 연결 시 아래 두 줄을 searchOrders(email) 호출로 교체
-      const filtered = mockOrders.filter((o) => o.email === email);
-      const data = { orders: filtered.map(({ deletedAt: _d, ...rest }) => rest as Order) };
+      const data = await searchOrders(email);
       setOrders(data.orders);
       setPatchSuccessOpen(true);
     } catch {
