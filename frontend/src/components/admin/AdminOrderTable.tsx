@@ -90,7 +90,9 @@ export default function AdminOrderTable() {
 
   function handleModalClose() {
     setModalOpen(false);
-    fetchOrders();
+    if (modalResult === "success") {
+      fetchOrders();
+    }
   }
 
   return (
