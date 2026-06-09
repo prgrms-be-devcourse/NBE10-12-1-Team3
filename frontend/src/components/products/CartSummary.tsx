@@ -41,17 +41,18 @@ export default function CartSummary({
         </>
       )}
       <div className="mt-4 pt-4 border-t shrink-0">
-        <p className="text-xs text-muted-foreground mb-2">{STRING_B}</p>
-        <div className="flex items-center justify-between">
+        <p className="text-xs text-muted-foreground mb-3">{STRING_B}</p>
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-sm text-muted-foreground">총 금액</span>
           <span className="font-semibold">{totalPrice.toLocaleString()}원</span>
-          <button
-            onClick={onProceed}
-            disabled={cart.length === 0}
-            className="px-5 py-2 bg-black text-white text-sm font-medium rounded-lg hover:bg-neutral-800 transition-colors disabled:opacity-40"
-          >
-            선택완료
-          </button>
         </div>
+        <button
+          onClick={onProceed}
+          disabled={cart.length === 0}
+          className="w-full py-2.5 bg-black text-white text-sm font-medium rounded-lg hover:bg-neutral-800 transition-colors disabled:opacity-40"
+        >
+          선택완료
+        </button>
       </div>
     </div>
   );
