@@ -1,5 +1,7 @@
 package com.be.mega.service;
 
+import com.be.mega.common.apiResponse.ErrorCode;
+import com.be.mega.common.exception.MegaException;
 import com.be.mega.dto.response.OrderSearchResponse;
 import com.be.mega.entity.Order;
 import com.be.mega.entity.OrderItem;
@@ -10,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -18,15 +22,30 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
 
-    public OrderSearchResponse.OrderCoverResponse getOrdersByEmail(String email) {
+    public OrderSearchResponse getOrdersByEmail(String email) {
         List<Order> orders = orderRepository.findByEmail(email);
-        List<OrderSearchResponse.OrderResponse> orderResponses = orders.stream()
-                .map(order -> {
-                    List<OrderItem> items = orderItemRepository.findByOrder(order);
-                    return OrderSearchResponse.OrderResponse.from(order, items);
-                })
+
+        if(orders.isEmpty()) {
+            throw new MegaException(ErrorCode.ENTITY_NOT_FOUND);
+        }
+
+        List<Long> orderIds = orders.stream()
+                .map(Order::getId)
                 .toList();
 
-        return new OrderSearchResponse.OrderCoverResponse(orderResponses);
+        List<OrderItem> allItems = orderItemRepository.findByOrderIdIn(orderIds);
+
+
+        Map<Long, List<OrderItem>> itemMap = allItems.stream()
+                .collect(Collectors.groupingBy(oi -> oi.getOrder().getId()));
+
+        List<OrderSearchResponse.OrderResponse> orderResponses = orders.stream()
+                .map(order -> OrderSearchResponse.OrderResponse.from(
+                        order,
+                        itemMap.getOrDefault(order.getId(), List.of())
+                ))
+                .toList();
+
+        return new OrderSearchResponse(orderResponses);
     }
 }

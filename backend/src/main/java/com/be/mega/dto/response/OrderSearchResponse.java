@@ -5,22 +5,7 @@ import com.be.mega.entity.OrderItem;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class OrderSearchResponse {
-
-    public record OrderItemResponse(
-            Long orderItemId,
-            Long itemId,
-            int quantity
-    ) {
-        public static OrderItemResponse from(OrderItem orderItem) {
-            return new OrderItemResponse(
-                    orderItem.getId(),
-                    orderItem.getItemId(),
-                    orderItem.getItemQuantity()
-            );
-        }
-    }
-
+public record OrderSearchResponse(List<OrderResponse> orders) {
     public record OrderResponse(
             Long orderId,
             String orderNumber,
@@ -47,7 +32,17 @@ public class OrderSearchResponse {
         }
     }
 
-    public record OrderCoverResponse(
-            List<OrderResponse> orders
-    ) {}
+    public record OrderItemResponse(
+            Long orderItemId,
+            Long itemId,
+            int quantity
+    ) {
+        public static OrderItemResponse from(OrderItem orderItem) {
+            return new OrderItemResponse(
+                    orderItem.getId(),
+                    orderItem.getItemId(),
+                    orderItem.getItemQuantity()
+            );
+        }
+    }
 }
