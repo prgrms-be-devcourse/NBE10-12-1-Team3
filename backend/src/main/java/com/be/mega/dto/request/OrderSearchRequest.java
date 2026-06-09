@@ -1,5 +1,5 @@
 package com.be.mega.dto.request;
 
-public record OrderListRequest(
+public record OrderSearchRequest(
         String email
 ) {}
