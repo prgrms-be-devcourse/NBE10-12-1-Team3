@@ -7,10 +7,12 @@ const mockOrders = [
     orderNumber: 20260601001,
     totalPrice: 33000,
     postStatus: "READY",
+    email: "user1@example.com",
     createdAt: "2026-06-01T10:00:00",
+    updatedAt: "2026-06-01T10:00:00",
     orderItems: [
-      { productId: 1, productName: "Colombia Nariño", quantity: 1, price: 18000 },
-      { productId: 2, productName: "Brazil Serra do Caparaó", quantity: 1, price: 15000 },
+      { orderItemId: 1, itemId: 1, quantity: 1 },
+      { orderItemId: 2, itemId: 2, quantity: 1 },
     ],
   },
   {
@@ -18,9 +20,11 @@ const mockOrders = [
     orderNumber: 20260603001,
     totalPrice: 32000,
     postStatus: "SHIPPED",
+    email: "user1@example.com",
     createdAt: "2026-06-03T14:30:00",
+    updatedAt: "2026-06-03T14:30:00",
     orderItems: [
-      { productId: 3, productName: "Ethiopia Gesha Village", quantity: 1, price: 32000 },
+      { orderItemId: 3, itemId: 3, quantity: 1 },
     ],
   },
   {
@@ -28,9 +32,11 @@ const mockOrders = [
     orderNumber: 20260605001,
     totalPrice: 48000,
     postStatus: "READY",
+    email: "user1@example.com",
     createdAt: "2026-06-05T09:15:00",
+    updatedAt: "2026-06-05T09:15:00",
     orderItems: [
-      { productId: 4, productName: "Jamaica Blue Mountain No.1", quantity: 1, price: 48000 },
+      { orderItemId: 4, itemId: 4, quantity: 1 },
     ],
   },
 ];
@@ -42,11 +48,12 @@ const adminOrders = [
     orderNumber: 20260606001,
     totalPrice: 63000,
     postStatus: "SHIPPED",
+    email: "user2@example.com",
     createdAt: "2026-06-06T11:00:00",
+    updatedAt: "2026-06-06T11:00:00",
     orderItems: [
-      { productId: 1, productName: "Colombia Nariño", quantity: 2, price: 36000 },
-      { productId: 2, productName: "Brazil Serra do Caparaó", quantity: 1, price: 15000 },
-      { productId: 3, productName: "Ethiopia Gesha Village", quantity: 1 - 1, price: 0 },
+      { orderItemId: 5, itemId: 1, quantity: 2 },
+      { orderItemId: 6, itemId: 2, quantity: 1 },
     ],
   },
   {
@@ -54,9 +61,11 @@ const adminOrders = [
     orderNumber: 20260607001,
     totalPrice: 15000,
     postStatus: "CANCELLED",
+    email: "user2@example.com",
     createdAt: "2026-06-07T16:45:00",
+    updatedAt: "2026-06-07T16:45:00",
     orderItems: [
-      { productId: 2, productName: "Brazil Serra do Caparaó", quantity: 1, price: 15000 },
+      { orderItemId: 7, itemId: 2, quantity: 1 },
     ],
   },
 ];
