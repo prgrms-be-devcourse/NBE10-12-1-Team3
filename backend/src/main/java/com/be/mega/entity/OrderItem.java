@@ -31,10 +31,9 @@ public class OrderItem extends BaseEntity {
     private String itemName;
 
     @Column(name = "item_id", nullable = false)
-    private int itemId;  // Product와 연관관계 없이 ID만 저장 (ERD 기준)
+    private Long itemId;
 
-    // === 연관관계 편의 메서드 (Order에서 호출) ===
     public void assignOrder(Order order) {
-        this.order = order; // OrderId에 order의 주문번호 등록
+        this.order = order;
     }
 }
