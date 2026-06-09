@@ -4,8 +4,18 @@ import com.be.mega.entity.Order;
 import com.be.mega.entity.OrderItem;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public record OrderSearchResponse(List<OrderResponse> orders) {
+    public static OrderSearchResponse from(List<Order> orders, Map<Long, List<OrderItem>> itemMap) {
+        List<OrderResponse> orderResponses = orders.stream()
+                .map(order -> OrderResponse.from(
+                        order,
+                        itemMap.getOrDefault(order.getId(), List.of())
+                ))
+                .toList();
+        return new OrderSearchResponse(orderResponses);
+    }
     public record OrderResponse(
             Long orderId,
             String orderNumber,
