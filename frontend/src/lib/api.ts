@@ -70,11 +70,15 @@ export function postOrder(body: {
   });
 }
 
-export function searchOrders(email: string): Promise<{ orders: Order[] }> {
+export function searchOrders(
+  email: string,
+  page: number,
+  size: number
+): Promise<{ orders: Order[]; totalPages: number; totalElements: number }> {
   return request("/v1/orders/search", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email }),
+    body: JSON.stringify({ email, page, size }),
   });
 }
 

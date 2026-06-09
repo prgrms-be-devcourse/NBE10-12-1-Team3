@@ -107,12 +107,15 @@ export const handlers = [
   }),
 
   http.post(`${BASE_URL}/v1/orders/search`, async ({ request }) => {
-    const { email } = await request.json() as { email: string };
-    const orders = mockOrders.filter((o) => o.email === email);
+    const { email, page = 0, size = 5 } = await request.json() as { email: string; page?: number; size?: number };
+    const filtered = mockOrders.filter((o) => o.email === email);
+    const totalElements = filtered.length;
+    const totalPages = Math.max(1, Math.ceil(totalElements / size));
+    const orders = filtered.slice(page * size, (page + 1) * size);
     return HttpResponse.json({
       statusCode: 200,
       resultType: "SUCCESS",
-      data: { orders },
+      data: { orders, totalElements, totalPages },
       message: "사용자 주문 전체 조회 성공",
     });
   }),

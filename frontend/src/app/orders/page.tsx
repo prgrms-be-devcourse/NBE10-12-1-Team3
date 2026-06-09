@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import OrderTable, { ItemChangeRecord } from "@/components/common/OrderTable";
 import Pagination from "@/components/common/Pagination";
@@ -34,6 +34,7 @@ export default function OrdersPage() {
   const [searchState, setSearchState] = useState<SearchState>("idle");
   const [orders, setOrders] = useState<Order[]>([]);
   const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
   const [itemChanges, setItemChanges] = useState<ItemChangeRecord[]>([]);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -41,20 +42,12 @@ export default function OrdersPage() {
   const [patchSuccessOpen, setPatchSuccessOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const totalPages = Math.ceil(orders.length / PAGE_SIZE);
-  const pagedOrders = orders.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
-
-  useEffect(() => {
-    if (searchState === "results" && orders.length === 0) {
-      setSearchState("empty");
-    }
-  }, [orders.length, searchState]);
-
-  useEffect(() => {
-    if (totalPages > 0 && page > totalPages) {
-      setPage(totalPages);
-    }
-  }, [orders.length, totalPages, page]);
+  async function fetchOrders(targetPage: number) {
+    const data = await searchOrders(email, targetPage - 1, PAGE_SIZE);
+    setOrders(data.orders);
+    setTotalPages(data.totalPages);
+    setSearchState(data.orders.length > 0 ? "results" : "empty");
+  }
 
   async function handleSearch() {
     if (!EMAIL_RE.test(email)) {
@@ -64,9 +57,7 @@ export default function OrdersPage() {
     setEmailError(false);
     setLoading(true);
     try {
-      const data = await searchOrders(email);
-      setOrders(data.orders);
-      setSearchState(data.orders.length > 0 ? "results" : "empty");
+      await fetchOrders(1);
       setPage(1);
       setSelectedOrderId(null);
       setItemChanges([]);
@@ -78,10 +69,10 @@ export default function OrdersPage() {
   async function handleDelete() {
     if (!selectedOrderId) return;
     await deleteOrder(selectedOrderId);
-    setOrders((prev) => prev.filter((o) => o.orderId !== selectedOrderId));
     setSelectedOrderId(null);
     setItemChanges([]);
     setDeleteOpen(false);
+    await fetchOrders(page);
   }
 
   async function handlePatch() {
@@ -98,18 +89,18 @@ export default function OrdersPage() {
         })),
       });
       setItemChanges([]);
-      const data = await searchOrders(email);
-      setOrders(data.orders);
+      await fetchOrders(page);
       setPatchSuccessOpen(true);
     } catch {
       setShippedOpen(true);
     }
   }
 
-  function handlePageChange(newPage: number) {
+  async function handlePageChange(newPage: number) {
     setPage(newPage);
     setSelectedOrderId(null);
     setItemChanges([]);
+    await fetchOrders(newPage);
   }
 
   return (
@@ -155,7 +146,7 @@ export default function OrdersPage() {
         <>
           <OrderTable
             key={page}
-            orders={pagedOrders.map(toAdminOrder)}
+            orders={orders.map(toAdminOrder)}
             onSelectionChange={setSelectedOrderId}
             onItemChange={setItemChanges}
           />
