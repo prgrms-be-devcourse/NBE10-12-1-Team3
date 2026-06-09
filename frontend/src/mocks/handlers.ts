@@ -1,6 +1,8 @@
 import { http, HttpResponse } from "msw";
 import { mockProducts, mockProductDetails } from "@/lib/mockProducts";
 
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+
 const mockOrders = [
   {
     orderId: 1,
@@ -39,10 +41,6 @@ const mockOrders = [
       { orderItemId: 4, itemId: 4, quantity: 1 },
     ],
   },
-];
-
-const adminOrders = [
-  ...mockOrders,
   {
     orderId: 4,
     orderNumber: 20260606001,
@@ -70,8 +68,10 @@ const adminOrders = [
   },
 ];
 
+const adminOrders = [...mockOrders];
+
 export const handlers = [
-  http.get("/v1/products", () => {
+  http.get(`${BASE_URL}/v1/products`, () => {
     return HttpResponse.json({
       statusCode: 200,
       resultType: "SUCCESS",
@@ -80,7 +80,7 @@ export const handlers = [
     });
   }),
 
-  http.get("/v1/products/:productId", ({ params }) => {
+  http.get(`${BASE_URL}/v1/products/:productId`, ({ params }) => {
     const id = Number(params.productId);
     const detail = mockProductDetails[id] ?? {
       productImage: mockProducts.items[0].productImage,
@@ -94,7 +94,7 @@ export const handlers = [
     });
   }),
 
-  http.post("/v1/orders", () => {
+  http.post(`${BASE_URL}/v1/orders`, () => {
     return HttpResponse.json(
       {
         statusCode: 201,
@@ -106,16 +106,18 @@ export const handlers = [
     );
   }),
 
-  http.post("/v1/orders/search", () => {
+  http.post(`${BASE_URL}/v1/orders/search`, async ({ request }) => {
+    const { email } = await request.json() as { email: string };
+    const orders = mockOrders.filter((o) => o.email === email);
     return HttpResponse.json({
       statusCode: 200,
       resultType: "SUCCESS",
-      data: { orders: mockOrders },
+      data: { orders },
       message: "사용자 주문 전체 조회 성공",
     });
   }),
 
-  http.patch("/v1/orders/items", () => {
+  http.patch(`${BASE_URL}/v1/orders/items`, () => {
     return HttpResponse.json({
       statusCode: 200,
       resultType: "SUCCESS",
@@ -124,11 +126,11 @@ export const handlers = [
     });
   }),
 
-  http.delete("/v1/orders/:orderId", () => {
+  http.delete(`${BASE_URL}/v1/orders/:orderId`, () => {
     return new HttpResponse(null, { status: 200 });
   }),
 
-  http.post("/v1/admin/verify-email", () => {
+  http.post(`${BASE_URL}/v1/admin/verify-email`, () => {
     return HttpResponse.json({
       statusCode: 200,
       resultType: "SUCCESS",
@@ -137,7 +139,7 @@ export const handlers = [
     });
   }),
 
-  http.get("/v1/admin/orders", ({ request }) => {
+  http.get(`${BASE_URL}/v1/admin/orders`, ({ request }) => {
     const url = new URL(request.url);
     const page = Number(url.searchParams.get("page") ?? 0);
     const size = Number(url.searchParams.get("size") ?? 10);
@@ -169,7 +171,7 @@ export const handlers = [
     });
   }),
 
-  http.patch("/v1/admin/orders/status", () => {
+  http.patch(`${BASE_URL}/v1/admin/orders/status`, () => {
     return HttpResponse.json({
       statusCode: 200,
       resultType: "SUCCESS",
