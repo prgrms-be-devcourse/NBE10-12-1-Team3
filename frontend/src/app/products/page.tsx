@@ -9,7 +9,8 @@ import ProductGrid from "@/components/products/ProductGrid";
 import CartSummary from "@/components/products/CartSummary";
 import OrderList from "@/components/products/OrderList";
 import CheckoutForm from "@/components/products/CheckoutForm";
-import { getProducts, postOrder } from "@/lib/api";
+import { /* getProducts, */ postOrder } from "@/lib/api";
+import { mockProducts } from "@/lib/mockProducts";
 
 export interface Product {
   productId: number;
@@ -42,7 +43,8 @@ export default function ProductsPage() {
 
   useEffect(() => {
     setCart(loadCart());
-    getProducts().then((data) => setProducts(data.items));
+    // getProducts().then((data) => setProducts(data.items));
+    setProducts(mockProducts.items);
   }, []);
 
   useEffect(() => {
