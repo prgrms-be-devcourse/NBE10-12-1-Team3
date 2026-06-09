@@ -6,8 +6,6 @@ import { BADGE_COLORS, PRODUCT_NAMES } from "@/lib/constants";
 import Pagination from "@/components/common/Pagination";
 import ShippingResultModal from "./ShippingResultModal";
 
-const PAGE_SIZE = 10;
-
 const STATUS_LABEL: Record<string, string> = {
   READY: "발송전",
   SHIPPED: "발송완료",
@@ -20,9 +18,15 @@ function formatDate(iso: string) {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
+function isEmail(str: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str);
+}
+
 export default function AdminOrderTable() {
   const [orders, setOrders] = useState<AdminOrder[]>([]);
-  const [sort, setSort] = useState("createdAt");
+  const [totalElements, setTotalElements] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [sort, setSort] = useState("desc");
   const [postStatus, setPostStatus] = useState("");
   const [keyword, setKeyword] = useState("");
   const [searchInput, setSearchInput] = useState("");
@@ -31,18 +35,24 @@ export default function AdminOrderTable() {
   const [modalResult, setModalResult] = useState<"none" | "success" | "failure">("success");
 
   const fetchOrders = useCallback(async () => {
-    const params: { sort?: string; postStatus?: string; keyword?: string } = { sort };
+    const params: Parameters<typeof getAdminOrders>[0] = {
+      page: page - 1,
+      size: 10,
+      sort,
+    };
     if (postStatus) params.postStatus = postStatus;
-    if (keyword) params.keyword = keyword;
+    const trimmed = keyword.trim();
+    if (trimmed) {
+      if (isEmail(trimmed)) params.email = trimmed;
+      else params.orderNumber = trimmed;
+    }
     const data = await getAdminOrders(params);
     setOrders(data.orders);
-    setPage(1);
-  }, [sort, postStatus, keyword]);
+    setTotalElements(data.totalElements ?? data.orders.length);
+    setTotalPages(data.totalPages ?? 1);
+  }, [page, sort, postStatus, keyword]);
 
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
-
-  const totalPages = Math.max(1, Math.ceil(orders.length / PAGE_SIZE));
-  const pageOrders = orders.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const totalByItem: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0 };
   for (const order of orders) {
@@ -71,33 +81,35 @@ export default function AdminOrderTable() {
       <div className="flex items-center gap-3 py-4">
         <select
           value={sort}
-          onChange={(e) => setSort(e.target.value)}
+          onChange={(e) => { setSort(e.target.value); setPage(1); }}
           className="border rounded-lg px-3 py-2 text-sm"
         >
-          <option value="createdAt">정렬: 날짜</option>
-          <option value="orderNumber">정렬: 주문번호</option>
+          <option value="desc">최신순</option>
+          <option value="asc">오래된순</option>
         </select>
         <select
           value={postStatus}
-          onChange={(e) => setPostStatus(e.target.value)}
+          onChange={(e) => { setPostStatus(e.target.value); setPage(1); }}
           className="border rounded-lg px-3 py-2 text-sm"
         >
           <option value="">발송여부별</option>
-          <option value="READY">READY</option>
-          <option value="SHIPPED">SHIPPED</option>
-          <option value="CANCELLED">CANCELLED</option>
+          <option value="ready">READY</option>
+          <option value="shipped">SHIPPED</option>
+          <option value="cancelled">CANCELLED</option>
         </select>
         <div className="flex-1 flex justify-end gap-2">
           <input
             type="text"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter") setKeyword(searchInput); }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") { setKeyword(searchInput); setPage(1); }
+            }}
             placeholder="검색어"
             className="border rounded-lg px-3 py-2 text-sm w-56"
           />
           <button
-            onClick={() => setKeyword(searchInput)}
+            onClick={() => { setKeyword(searchInput); setPage(1); }}
             className="border rounded-lg px-4 py-2 text-sm hover:bg-accent"
           >
             검색
@@ -110,7 +122,7 @@ export default function AdminOrderTable() {
           <thead>
             <tr className="bg-amber-50 border-b">
               <th colSpan={5} className="p-2 text-left font-medium">
-                총 주문 {orders.length}건
+                총 주문 {totalElements}건
               </th>
               {[1, 2, 3, 4].map((itemId, i) => (
                 <th key={itemId} className="p-2 text-center font-medium">
@@ -131,7 +143,7 @@ export default function AdminOrderTable() {
             </tr>
           </thead>
           <tbody>
-            {pageOrders.map((order) => (
+            {orders.map((order) => (
               <tr
                 key={order.orderId}
                 className="border-b hover:bg-muted/40 transition-colors"

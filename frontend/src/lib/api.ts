@@ -101,19 +101,20 @@ export function postAdminVerifyEmail(email: string): Promise<void> {
   });
 }
 
-export function getAdminOrders(params?: {
+export function getAdminOrders(params: {
+  page: number;
+  size: number;
   sort?: string;
   postStatus?: string;
-  keyword?: string;
-}): Promise<{ orders: AdminOrder[] }> {
-  const query = params
-    ? "?" + new URLSearchParams(
-        Object.fromEntries(
-          Object.entries(params).filter(([, v]) => v !== undefined)
-        ) as Record<string, string>
-      ).toString()
-    : "";
-  return request(`/v1/admin/orders${query}`);
+  email?: string;
+  orderNumber?: string;
+}): Promise<{ orders: AdminOrder[]; totalElements: number; totalPages: number }> {
+  const query = new URLSearchParams(
+    Object.entries(params)
+      .filter(([, v]) => v !== undefined && v !== "")
+      .map(([k, v]) => [k, String(v)])
+  ).toString();
+  return request(`/v1/admin/orders${query ? "?" + query : ""}`);
 }
 
 export function patchAdminOrderStatus(): Promise<void> {

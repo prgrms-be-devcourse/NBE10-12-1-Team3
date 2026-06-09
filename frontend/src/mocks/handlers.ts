@@ -128,13 +128,24 @@ export const handlers = [
     });
   }),
 
-  http.get("/v1/admin/orders", () => {
-    return HttpResponse.json({
-      statusCode: 200,
-      resultType: "SUCCESS",
-      data: { orders: adminOrders },
-      message: "조회 성공",
-    });
+  http.get("/v1/admin/orders", ({ request }) => {
+    const url = new URL(request.url);
+    const page = Number(url.searchParams.get("page") ?? 0);
+    const size = Number(url.searchParams.get("size") ?? 10);
+    const postStatus = url.searchParams.get("postStatus");
+    const email = url.searchParams.get("email");
+    const orderNumber = url.searchParams.get("orderNumber");
+
+    let filtered = [...adminOrders];
+    if (postStatus) filtered = filtered.filter((o) => o.postStatus.toLowerCase() === postStatus);
+    if (email) filtered = filtered.filter((o) => (o.email ?? "").includes(email));
+    if (orderNumber) filtered = filtered.filter((o) => String(o.orderNumber).includes(orderNumber));
+
+    const totalElements = filtered.length;
+    const totalPages = Math.max(1, Math.ceil(totalElements / size));
+    const orders = filtered.slice(page * size, (page + 1) * size);
+
+    return HttpResponse.json({ orders, totalElements, totalPages });
   }),
 
   http.patch("/v1/admin/orders/status", () => {
