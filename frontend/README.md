@@ -42,3 +42,29 @@ NEXT_PUBLIC_USE_MOCK=true
 pnpm install
 pnpm dev
 ```
+
+**특정 API만 Mock으로 테스트하고 싶을 때**
+
+MSW는 `onUnhandledRequest: "bypass"` 옵션으로 동작합니다.
+`src/mocks/handlers.ts`에 핸들러가 등록된 경로만 Mock이 가로채고, 나머지는 실제 백엔드로 통과합니다.
+
+따라서 Mock이 필요 없는 핸들러는 `handlers.ts`에서 주석 처리하면 해당 API는 백엔드로 연결됩니다.
+Mock과 실제 API를 경로 단위로 혼용할 수 있습니다.
+
+```ts
+// src/mocks/handlers.ts 예시
+export const handlers = [
+  // http.get("/v1/products", handler) ← 주석 처리 시 실제 백엔드로 연결
+  http.get("/v1/admin/orders", handler), // ← Mock 사용
+];
+```
+
+---
+
+### 프론트 단독 테스트 환경 제거 시
+
+```bash
+rm frontend/public/mockServiceWorker.js
+```
+
+`.env.local`에서 `NEXT_PUBLIC_USE_MOCK=true` 줄을 삭제합니다.
