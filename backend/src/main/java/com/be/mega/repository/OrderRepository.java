@@ -14,7 +14,9 @@ import java.time.LocalDateTime;
 public interface OrderRepository extends JpaRepository<Order,Long> {
 
     @Modifying(clearAutomatically = true)
-    @Query("UPDATE Order ord SET ord.postStatus = :newStatus WHERE ord.createdAt >= :start AND ord.createdAt < :end AND ord.postStatus = :currentStatus")
+    @Query("UPDATE Order ord SET ord.postStatus = :newStatus " +
+            "WHERE ord.createdAt >= :start AND ord.createdAt < :end " +
+            "AND ord.postStatus = :currentStatus AND ord.deletedAt IS NULL")
     int bulkUpdateStatusInRange(
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end,
