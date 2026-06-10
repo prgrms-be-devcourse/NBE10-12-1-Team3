@@ -15,11 +15,7 @@ public enum ErrorCode {
     ENTITY_NOT_FOUND("객체를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     ENTITY_TYPE_INVALID("유효하지 않은 엔터티 타입입니다.", HttpStatus.BAD_REQUEST),
     BAD_REQUEST("잘못된 요청입니다", HttpStatus.BAD_REQUEST),
-    FORBIDDEN("권한이 없습니다.", HttpStatus.FORBIDDEN),
-
-    // 발송처리 에러
-    ORDER_NO_TARGET("발송처리할 주문이 없습니다.", HttpStatus.BAD_REQUEST),
-    ORDER_UPDATE_FAILED("발송처리에 실패했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+    FORBIDDEN("권한이 없습니다.", HttpStatus.FORBIDDEN);
 
 
     private final String message;
