@@ -27,7 +27,7 @@ public class OrderController {
 
     @PatchMapping("/items")
     public CustomApiResponse<OrderItemUpdateResponse> updateOrders(
-            @RequestBody OrderItemUpdateRequest request) {
+            @Valid @RequestBody OrderItemUpdateRequest request) {
         OrderItemUpdateResponse response = orderService.updateOrders(request);
         return CustomApiResponse.success(response, 200, "주문 수량이 변경되었습니다.");
     }

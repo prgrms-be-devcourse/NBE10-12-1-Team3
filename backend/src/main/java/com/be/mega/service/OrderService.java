@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,58 +36,55 @@ public class OrderService {
                 .map(Order::getId)
                 .toList();
 
-        List<OrderItem> allItems = orderItemRepository.findByOrderIdIn(orderIds);
-
+        List<OrderItem> allItems = orderItemRepository.findByOrder_IdIn(orderIds);
 
         Map<Long, List<OrderItem>> itemMap = allItems.stream()
                 .collect(Collectors.groupingBy(orderitem -> orderitem.getOrder().getId()));
-
 
         return OrderSearchResponse.from(orders, itemMap);
     }
 
     @Transactional
     public OrderItemUpdateResponse updateOrders(OrderItemUpdateRequest request) {
-
-        List<Order> updatedOrders = request.orders().stream()
-                .map(orderRequest -> {
-                    Order order = orderRepository.findById(orderRequest.orderId())
-                            .orElseThrow(() -> new MegaException(ErrorCode.ENTITY_NOT_FOUND));
-
-                    List<OrderItem> items = orderItemRepository.findByOrderIdIn(List.of(orderRequest.orderId()));
-
-                    updateOrderItems(items, orderRequest.orderItems());
-                    recalculateTotalPrice(order, items);
-
-                    return order;
-                })
+        List<Long> orderIds = request.orders().stream()
+                .map(OrderItemUpdateRequest.OrderRequest::orderId)
                 .toList();
 
-        List<Long> orderIds = updatedOrders.stream()
-                .map(Order::getId)
+        Map<Long, Order> orderMap = orderRepository.findAllById(orderIds).stream()
+                .collect(Collectors.toMap(Order::getId, order -> order));
+
+        Map<Long, List<OrderItem>> itemMap = orderItemRepository.findByOrder_IdIn(orderIds).stream()
+                .collect(Collectors.groupingBy(OrderItem::getOrderId));
+
+        request.orders().forEach(orderRequest -> {
+            Order order =
+                    Optional.ofNullable(orderMap.get(orderRequest.orderId()))
+                    .orElseThrow(() -> new MegaException(ErrorCode.ENTITY_NOT_FOUND));
+
+            List<OrderItem> items = itemMap.getOrDefault(orderRequest.orderId(), List.of());
+
+            updateOrderItems(items, orderRequest.orderItems());
+            order.recalculateTotalPrice(items);
+        });
+
+        List<OrderItem> finalItems = itemMap.values().stream()
+                .flatMap(List::stream)
                 .toList();
 
-        List<OrderItem> allItems = orderItemRepository.findByOrderIdIn(orderIds);
-        return OrderItemUpdateResponse.of(updatedOrders, allItems);
+        return OrderItemUpdateResponse.of(orderMap.values().stream().toList(), finalItems);
     }
-
 
     private void updateOrderItems(List<OrderItem> items, List<OrderItemUpdateRequest.OrderItemRequest> itemRequests) {
-        itemRequests.forEach(itemRequest ->
-                items.stream()
-                        .filter(item -> item.getId().equals(itemRequest.orderItemId()))
-                        .findFirst()
-                        .orElseThrow(() -> new MegaException(ErrorCode.ENTITY_NOT_FOUND))
-                        .updateQuantity(itemRequest.quantity())
-        );
+        itemRequests.stream()
+                .filter(req -> req.quantity() > 0)
+                .forEach(itemRequest ->
+                        items.stream()
+                                .filter(item -> item.getId().equals(itemRequest.orderItemId()))
+                                .findFirst()
+                                .orElseThrow(() -> new MegaException(ErrorCode.ENTITY_NOT_FOUND))
+                                .updateQuantity(itemRequest.quantity())
+                );
     }
 
-
-    private void recalculateTotalPrice(Order order, List<OrderItem> items) {
-        int totalPrice = items.stream()
-                .mapToInt(item -> item.getItemPrice() * item.getItemQuantity())
-                .sum();
-        order.updateTotalPrice(totalPrice);
-    }
 }
 

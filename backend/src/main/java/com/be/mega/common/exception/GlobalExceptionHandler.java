@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -146,4 +147,17 @@ public class GlobalExceptionHandler {
                         )
                 );
     }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<CustomApiResponse<?>> handleValidation(
+            MethodArgumentNotValidException e
+    ) {
+        log.warn("MethodArgumentNotValidException", e);
+        return ResponseEntity.badRequest()
+                .body(
+                        CustomApiResponse.fail(
+                                ErrorCode.PARAMETER_INVALID,
+                                List.of("수량은 0 이상이어야 합니다.", "모든 주문 항목의 수량이 0입니다.")));
+    }
+
 }

@@ -7,6 +7,7 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Entity
@@ -52,5 +53,12 @@ public class Order extends BaseEntity {
     }
 
     public void updateTotalPrice(int totalPrice) { this.totalPrice = totalPrice; }
+
+    public void recalculateTotalPrice(List<OrderItem> items) {
+        this.totalPrice = items.stream()
+                .filter(item -> item.getItemQuantity() > 0)
+                .mapToInt(item -> item.getItemPrice() * item.getItemQuantity())
+                .sum();
+    }
 
 }

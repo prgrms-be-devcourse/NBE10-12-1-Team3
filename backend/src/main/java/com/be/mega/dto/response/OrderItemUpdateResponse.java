@@ -12,7 +12,7 @@ public record OrderItemUpdateResponse(List<OrderResponse> orders) {
 
     public static OrderItemUpdateResponse of(List<Order> orders, List<OrderItem> allItems) {
         Map<Long, List<OrderItem>> itemMap = allItems.stream()
-                .collect(Collectors.groupingBy(oi -> oi.getOrder().getId()));
+                .collect(Collectors.groupingBy(OrderItem::getOrderId));
 
         List<OrderResponse> orderResponses = orders.stream()
                 .map(order -> OrderResponse.from(
