@@ -36,4 +36,8 @@ public class OrderItem extends BaseEntity {
     public void assignOrder(Order order) {
         this.order = order;
     }
+
+    public void updateQuantity(int quantity) { this.itemQuantity = quantity; }
+
+    public Long getOrderId() { return this.order.getId(); }
 }

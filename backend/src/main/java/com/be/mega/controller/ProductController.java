@@ -30,7 +30,7 @@ public class ProductController {
     @Operation(summary = "상품 상세 설명 표시")
     @GetMapping("/{productId}")
     public CustomApiResponse<ShowDetailProductResponse> getDetailProduct(
-            @PathVariable Long productId
+            @PathVariable("productId") Long productId
     ) {
         ShowDetailProductResponse response = productService.getDetailProduct(productId);
         return CustomApiResponse.success(response, 200, "개별 상품 상세내용 조회 완료");
