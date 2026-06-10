@@ -32,6 +32,9 @@ export default function AdminOrderTable() {
   const [searchType, setSearchType] = useState<"email" | "orderNumber">(() =>
     searchParams.get("orderNumber") ? "orderNumber" : "email"
   );
+  const [committedSearchType, setCommittedSearchType] = useState<"email" | "orderNumber">(() =>
+    searchParams.get("orderNumber") ? "orderNumber" : "email"
+  );
   const [keyword, setKeyword] = useState(() => searchParams.get("email") ?? searchParams.get("orderNumber") ?? "");
   const [searchInput, setSearchInput] = useState(() => searchParams.get("email") ?? searchParams.get("orderNumber") ?? "");
   const [page, setPage] = useState(() => Number(searchParams.get("page") ?? "1"));
@@ -48,14 +51,14 @@ export default function AdminOrderTable() {
     if (postStatus) params.postStatus = postStatus;
     const trimmed = keyword.trim();
     if (trimmed) {
-      if (searchType === "email") params.email = trimmed;
+      if (committedSearchType === "email") params.email = trimmed;
       else params.orderNumber = trimmed;
     }
     const data = await getAdminOrders(params);
     setOrders(data.orders);
     setTotalElements(data.totalElements);
     setTotalPages(data.totalPages ?? data.orders.length);
-  }, [page, sortBy, sortDir, postStatus, keyword, searchType]);
+  }, [page, sortBy, sortDir, postStatus, keyword, committedSearchType]);
 
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
 
@@ -65,13 +68,13 @@ export default function AdminOrderTable() {
     params.set("sortBy", sortBy);
     if (postStatus) params.set("postStatus", postStatus);
     if (keyword) {
-      if (searchType === "email") params.set("email", keyword.trim());
+      if (committedSearchType === "email") params.set("email", keyword.trim());
       else params.set("orderNumber", keyword.trim());
     }
     if (page > 1) params.set("page", String(page));
     const query = params.toString();
     router.replace(`/admin/orders${query ? `?${query}` : ""}`);
-  }, [sortBy, sortDir, postStatus, keyword, searchType, page, router]);
+  }, [sortBy, sortDir, postStatus, keyword, committedSearchType, page, router]);
 
   const totalByItem: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0 };
   for (const order of orders) {
@@ -143,14 +146,14 @@ export default function AdminOrderTable() {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") { setKeyword(searchInput); setPage(1); }
+                if (e.key === "Enter") { setKeyword(searchInput); setCommittedSearchType(searchType); setPage(1); }
               }}
               placeholder="이메일 또는 주문번호"
               className="px-3 py-2 text-sm w-56 focus:outline-none"
             />
           </div>
           <button
-            onClick={() => { setKeyword(searchInput); setPage(1); }}
+            onClick={() => { setKeyword(searchInput); setCommittedSearchType(searchType); setPage(1); }}
             className="border rounded-lg px-4 py-2 text-sm bg-white hover:bg-accent"
           >
             검색

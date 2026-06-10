@@ -39,6 +39,7 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(false);
   const [hasZeroOrder, setHasZeroOrder] = useState(false);
   const [patchCount, setPatchCount] = useState(0);
+  const [lastSearchedEmail, setLastSearchedEmail] = useState("");
 
   async function fetchOrders() {
     const data = await searchOrders(email);
@@ -58,6 +59,10 @@ export default function OrdersPage() {
       setSelectedOrderId(null);
       setItemChanges([]);
       setHasZeroOrder(false);
+      if (email !== lastSearchedEmail) {
+        setPatchCount((c) => c + 1);
+        setLastSearchedEmail(email);
+      }
     } finally {
       setLoading(false);
     }
@@ -171,7 +176,7 @@ export default function OrdersPage() {
                       </Dialog.Close>
                       <button
                         onClick={handleDelete}
-                        className="px-4 py-1.5 rounded-md text-sm bg-destructive text-destructive-foreground hover:opacity-90"
+                        className="px-4 py-1.5 rounded-md text-sm border hover:bg-accent"
                       >
                         삭제
                       </button>
