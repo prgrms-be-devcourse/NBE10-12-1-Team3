@@ -37,17 +37,17 @@ public class AdminController {
     @GetMapping("/orders")
     @Operation(summary = "관리자 주문 조회", description = "관리자가 주문 조회 및 검색 API")
     public CustomApiResponse<OrderListResponse> showOrders(
-            @RequestParam(defaultValue = "0")
+            @RequestParam(name = "page", defaultValue = "0")
             @Min(value = 0, message = "page는 0 이상이어야 합니다.")
             int page,
-            @RequestParam(defaultValue = "10")
+            @RequestParam(name = "size", defaultValue = "10")
             @Min(value = 1, message = "size는 1 이상이어야 합니다.")
             @Max(value = 100, message = "size는 100 이하여야 합니다.")
             int size,
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) String orderNumber,
-            @RequestParam(required = false) PostStatus postStatus,
-            @RequestParam(defaultValue = "desc")
+            @RequestParam(name = "email", required = false) String email,
+            @RequestParam(name = "orderNumber", required = false) String orderNumber,
+            @RequestParam(name = "postStatus", required = false) PostStatus postStatus,
+            @RequestParam(name = "sort", defaultValue = "desc")
             @Pattern(
                     regexp = "asc|desc",
                     flags = Pattern.Flag.CASE_INSENSITIVE,
