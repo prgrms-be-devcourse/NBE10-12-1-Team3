@@ -21,7 +21,7 @@ export default function ProductGrid({
   return (
     <div className="p-6 flex flex-col h-full">
       <h2 className="text-lg font-semibold mb-4">상품 목록</h2>
-      <div className="grid grid-cols-2 gap-4 flex-1 overflow-y-auto">
+      <div className="grid grid-cols-2 gap-4 flex-1 overflow-y-auto items-start content-start">
         {products.map((product) => {
           const cartItem = cart.find(
             (i) => i.product.productId === product.productId

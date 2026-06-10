@@ -21,17 +21,17 @@ export default function ProductQuickView({ productId }: Props) {
   }, [productId]);
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto">
+    <div className="flex flex-col h-full overflow-hidden">
       {detail ? (
         <>
-          <div className="px-4 pt-4">
+          <div className="w-full pt-2">
             <img
               src={detail.productImage}
               alt=""
-              className="w-full object-contain"
+              className="w-full object-contain rounded-lg"
             />
           </div>
-          <p className="p-4 text-sm text-muted-foreground">{detail.detail}</p>
+          <p className="pt-3 text-sm text-muted-foreground shrink-0">{detail.detail}</p>
         </>
       ) : error ? (
         <div className="flex-1 flex items-center justify-center text-sm text-muted-foreground">

@@ -22,7 +22,7 @@ export default function CartSummary({
       <h2 className="text-lg font-semibold mb-2">Cart</h2>
       <hr className="mb-4" />
       {hoveredProduct ? (
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 min-h-0 overflow-hidden">
           <ProductQuickView productId={hoveredProduct.productId} />
         </div>
       ) : (
