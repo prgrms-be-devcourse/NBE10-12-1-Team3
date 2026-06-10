@@ -19,7 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -64,4 +65,10 @@ public class AdminService {
         return OrderListResponse.of(orderPage, orderItems);
     }
 
+    @Transactional
+    public int markOrderAsDelivered() {
+        LocalDateTime start = LocalDateTime.now().minusDays(1).withHour(14).truncatedTo(ChronoUnit.HOURS);
+        LocalDateTime end = LocalDateTime.now().withHour(14).truncatedTo(ChronoUnit.HOURS);
+        return orderRepository.bulkUpdateStatusInRange(start, end, PostStatus.READY, PostStatus.DELIVERED);
+    }
 }

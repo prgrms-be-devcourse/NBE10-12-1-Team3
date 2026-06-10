@@ -65,4 +65,13 @@ public class AdminController {
         );
         return CustomApiResponse.success(response, 200, "주문 조회 성공");
     }
+
+        @PatchMapping("orders/status")
+        public CustomApiResponse<Integer> markAsShipped() {
+            int updated = adminService.markOrderAsDelivered();
+            if (updated == 0) {
+                return CustomApiResponse.success(0, 200, "발송처리할 주문이 없습니다.");
+            }
+            return CustomApiResponse.success(updated, 200, updated + "건 발송 처리 완료");
+        }
 }
