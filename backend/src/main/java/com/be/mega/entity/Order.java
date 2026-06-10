@@ -4,7 +4,6 @@ import com.be.mega.entity.enums.PostStatus;
 import com.be.mega.common.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,7 +40,6 @@ public class Order extends BaseEntity {
     private String orderNumber;
 
     @Column(name = "deleted_at")
-    @ColumnDefault("null")
     private LocalDateTime deletedAt;
 
     public void orderDelete() {

@@ -26,7 +26,7 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     public OrderSearchResponse getOrdersByEmail(String email) {
-        List<Order> orders = orderRepository.findByEmail(email);
+        List<Order> orders = orderRepository.findByEmailAndDeletedAtIsNull(email);
 
         if(orders.isEmpty()) {
             throw new MegaException(ErrorCode.ENTITY_NOT_FOUND);
