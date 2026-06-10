@@ -59,7 +59,7 @@ public class AdminService {
 
         List<OrderItem> orderItems = orderIds.isEmpty()
                 ? List.of()
-                : orderItemRepository.findAllByOrderIdIn(orderIds);
+                : orderItemRepository.findByOrderIdIn(orderIds);
 
         return OrderListResponse.of(orderPage, orderItems);
     }
