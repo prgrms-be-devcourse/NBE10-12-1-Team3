@@ -40,7 +40,7 @@ public class OrderController {
     @Operation(summary = "주문 삭제", description = "주문을 soft delete 처리합니다.")
     @DeleteMapping("/{orderId}")
     public CustomApiResponse<Void> deleteOrder(
-            @PathVariable Long orderId) {
+            @PathVariable("orderId") Long orderId) {
         orderService.deleteOrder(orderId);
         return CustomApiResponse.success(null, 200, "주문이 삭제되었습니다.");
     }
