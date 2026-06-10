@@ -113,6 +113,7 @@ export default function OrderTable({ orders, onSelectionChange, onItemChange, on
         <tbody>
           {orders.map((order) => {
             const allZero = isAllZero(order);
+            const badgeLabel = order.deletedAt !== null ? "취소됨" : (STATUS_LABEL[order.postStatus] ?? order.postStatus);
             return (
             <tr
               key={order.orderId}
@@ -128,10 +129,10 @@ export default function OrderTable({ orders, onSelectionChange, onItemChange, on
               <td className="p-2">
                 <span
                   className={`px-2 py-0.5 rounded-full text-xs text-white ${
-                    BADGE_COLORS[STATUS_LABEL[order.postStatus]] ?? "bg-gray-400"
+                    BADGE_COLORS[badgeLabel] ?? "bg-gray-400"
                   }`}
                 >
-                  {STATUS_LABEL[order.postStatus] ?? order.postStatus}
+                  {badgeLabel}
                 </span>
               </td>
               <td className="p-2">{order.orderNumber}</td>
