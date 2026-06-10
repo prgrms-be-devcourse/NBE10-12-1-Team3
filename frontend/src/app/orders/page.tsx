@@ -37,6 +37,7 @@ export default function OrdersPage() {
   const [shippedOpen, setShippedOpen] = useState(false);
   const [patchSuccessOpen, setPatchSuccessOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [hasZeroOrder, setHasZeroOrder] = useState(false);
 
   async function fetchOrders() {
     const data = await searchOrders(email);
@@ -55,6 +56,7 @@ export default function OrdersPage() {
       await fetchOrders();
       setSelectedOrderId(null);
       setItemChanges([]);
+      setHasZeroOrder(false);
     } finally {
       setLoading(false);
     }
@@ -135,6 +137,7 @@ export default function OrdersPage() {
             orders={orders.map(toAdminOrder)}
             onSelectionChange={setSelectedOrderId}
             onItemChange={setItemChanges}
+            onZeroOrderChange={setHasZeroOrder}
           />
           <div className="mt-4 flex justify-end gap-2">
               <Dialog.Root open={deleteOpen} onOpenChange={setDeleteOpen}>
@@ -170,7 +173,7 @@ export default function OrdersPage() {
               </Dialog.Root>
 
               <button
-                disabled={itemChanges.length === 0}
+                disabled={itemChanges.length === 0 || hasZeroOrder}
                 onClick={handlePatch}
                 className="px-4 py-1.5 rounded-md text-sm border bg-white hover:bg-accent disabled:opacity-40 disabled:pointer-events-none"
               >

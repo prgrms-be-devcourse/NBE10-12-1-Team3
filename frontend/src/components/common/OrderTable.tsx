@@ -15,6 +15,7 @@ interface Props {
   orders: AdminOrder[];
   onSelectionChange?: (orderId: number | null) => void;
   onItemChange?: (changes: ItemChangeRecord[]) => void;
+  onZeroOrderChange?: (hasZeroOrder: boolean) => void;
 }
 
 const STATUS_LABEL: Record<string, string> = {
@@ -34,7 +35,7 @@ function formatDate(iso: string) {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
-export default function OrderTable({ orders, onSelectionChange, onItemChange }: Props) {
+export default function OrderTable({ orders, onSelectionChange, onItemChange, onZeroOrderChange }: Props) {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [localQty, setLocalQty] = useState<Record<string, number>>({});
   const [changesMap, setChangesMap] = useState<Record<string, ItemChangeRecord>>({});
@@ -42,6 +43,13 @@ export default function OrderTable({ orders, onSelectionChange, onItemChange }: 
   function getQty(orderId: number, itemId: number, original: number) {
     const key = `${orderId}-${itemId}`;
     return key in localQty ? localQty[key] : original;
+  }
+
+  function isAllZero(order: AdminOrder): boolean {
+    return (
+      order.orderItems.length > 0 &&
+      order.orderItems.every((item) => getQty(order.orderId, item.itemId, item.quantity) === 0)
+    );
   }
 
   function handleSelect(orderId: number) {
@@ -69,6 +77,15 @@ export default function OrderTable({ orders, onSelectionChange, onItemChange }: 
     setLocalQty(nextLocalQty);
     setChangesMap(nextChanges);
     onItemChange?.(Object.values(nextChanges));
+
+    const hasZero = orders.some((order) =>
+      order.orderItems.length > 0 &&
+      order.orderItems.every((item) => {
+        const k = `${order.orderId}-${item.itemId}`;
+        return (k in nextLocalQty ? nextLocalQty[k] : item.quantity) === 0;
+      })
+    );
+    onZeroOrderChange?.(hasZero);
   }
 
   return (
@@ -87,12 +104,16 @@ export default function OrderTable({ orders, onSelectionChange, onItemChange }: 
           </tr>
         </thead>
         <tbody>
-          {orders.map((order) => (
+          {orders.map((order) => {
+            const allZero = isAllZero(order);
+            return (
             <tr
               key={order.orderId}
               onClick={() => handleSelect(order.orderId)}
               className={`border-b border-l-2 cursor-pointer transition-colors ${
-                selectedId === order.orderId
+                allZero
+                  ? "border-l-red-500 bg-red-50"
+                  : selectedId === order.orderId
                   ? "border-l-black bg-neutral-100"
                   : "border-l-transparent hover:bg-muted/40"
               }`}
@@ -170,7 +191,8 @@ export default function OrderTable({ orders, onSelectionChange, onItemChange }: 
                 {order.totalPrice.toLocaleString()}원
               </td>
             </tr>
-          ))}
+            );
+          })}
         </tbody>
       </table>
     </div>
