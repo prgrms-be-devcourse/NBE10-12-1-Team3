@@ -19,10 +19,6 @@ function formatDate(iso: string) {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
-function isEmail(str: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(str);
-}
-
 export default function AdminOrderTable() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -32,6 +28,9 @@ export default function AdminOrderTable() {
   const [totalPages, setTotalPages] = useState(1);
   const [sort, setSort] = useState(() => searchParams.get("sort") ?? "");
   const [postStatus, setPostStatus] = useState(() => searchParams.get("postStatus") ?? "");
+  const [searchType, setSearchType] = useState<"email" | "orderNumber">(() =>
+    searchParams.get("orderNumber") ? "orderNumber" : "email"
+  );
   const [keyword, setKeyword] = useState(() => searchParams.get("email") ?? searchParams.get("orderNumber") ?? "");
   const [searchInput, setSearchInput] = useState(() => searchParams.get("email") ?? searchParams.get("orderNumber") ?? "");
   const [page, setPage] = useState(() => Number(searchParams.get("page") ?? "1"));
@@ -47,14 +46,14 @@ export default function AdminOrderTable() {
     if (postStatus) params.postStatus = postStatus;
     const trimmed = keyword.trim();
     if (trimmed) {
-      if (isEmail(trimmed)) params.email = trimmed;
+      if (searchType === "email") params.email = trimmed;
       else params.orderNumber = trimmed;
     }
     const data = await getAdminOrders(params);
     setOrders(data.orders);
     setTotalElements(data.totalElements);
     setTotalPages(data.totalPages);
-  }, [page, sort, postStatus, keyword]);
+  }, [page, sort, postStatus, keyword, searchType]);
 
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
 
@@ -63,13 +62,13 @@ export default function AdminOrderTable() {
     if (sort) params.set("sort", sort);
     if (postStatus) params.set("postStatus", postStatus);
     if (keyword) {
-      if (isEmail(keyword.trim())) params.set("email", keyword.trim());
+      if (searchType === "email") params.set("email", keyword.trim());
       else params.set("orderNumber", keyword.trim());
     }
     if (page > 1) params.set("page", String(page));
     const query = params.toString();
     router.replace(`/admin/orders${query ? `?${query}` : ""}`);
-  }, [sort, postStatus, keyword, page, router]);
+  }, [sort, postStatus, keyword, searchType, page, router]);
 
   const totalByItem: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0 };
   for (const order of orders) {
@@ -118,16 +117,26 @@ export default function AdminOrderTable() {
           <option value="cancelled">CANCELLED</option>
         </select>
         <div className="flex-1 flex justify-end gap-2">
-          <input
-            type="text"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") { setKeyword(searchInput); setPage(1); }
-            }}
-            placeholder="이메일 또는 주문번호"
-            className="border rounded-lg px-3 py-2 text-sm w-56 bg-white"
-          />
+          <div className="flex border rounded-lg bg-white overflow-hidden">
+            <select
+              value={searchType}
+              onChange={(e) => setSearchType(e.target.value as "email" | "orderNumber")}
+              className="px-2 py-2 text-sm border-r bg-white focus:outline-none"
+            >
+              <option value="email">이메일</option>
+              <option value="orderNumber">주문번호</option>
+            </select>
+            <input
+              type="text"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") { setKeyword(searchInput); setPage(1); }
+              }}
+              placeholder="이메일 또는 주문번호"
+              className="px-3 py-2 text-sm w-56 focus:outline-none"
+            />
+          </div>
           <button
             onClick={() => { setKeyword(searchInput); setPage(1); }}
             className="border rounded-lg px-4 py-2 text-sm bg-white hover:bg-accent"
