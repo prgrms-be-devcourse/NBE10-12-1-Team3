@@ -85,5 +85,17 @@ public class OrderService {
                 );
     }
 
+    @Transactional
+    public void deleteOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new MegaException(ErrorCode.ENTITY_NOT_FOUND));
+
+        if (order.isDeleted()) {
+            throw new MegaException(ErrorCode.BAD_REQUEST);
+        }
+
+        order.orderDelete();
+    }
+
 }
 
