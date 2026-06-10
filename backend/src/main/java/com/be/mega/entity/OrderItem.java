@@ -36,4 +36,19 @@ public class OrderItem extends BaseEntity {
     public void assignOrder(Order order) {
         this.order = order;
     }
+
+    public void updateQuantity(int quantity) { this.itemQuantity = quantity; }
+
+    public Long getOrderId() { return this.order.getId(); }
+
+    public static OrderItem create(Order order, Product product, int quantity) {
+        return new OrderItem(
+                null,
+                order,
+                product.getProductPrice(),
+                quantity,
+                product.getProductName(),
+                product.getId()
+        );
+    }
 }

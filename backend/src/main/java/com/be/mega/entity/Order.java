@@ -4,9 +4,9 @@ import com.be.mega.entity.enums.PostStatus;
 import com.be.mega.common.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Entity
@@ -27,7 +27,7 @@ public class Order extends BaseEntity {
     private String address;
 
     @Column(name = "postal_code", nullable = false)
-    private int postalCode;
+    private String postalCode;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "post_status", nullable = false)
@@ -40,7 +40,6 @@ public class Order extends BaseEntity {
     private String orderNumber;
 
     @Column(name = "deleted_at")
-    @ColumnDefault("null")
     private LocalDateTime deletedAt;
 
     public void orderDelete() {
@@ -49,6 +48,34 @@ public class Order extends BaseEntity {
 
     public boolean isDeleted() {
         return this.deletedAt != null;
+    }
+
+    public void updateTotalPrice(int totalPrice) { this.totalPrice = totalPrice; }
+
+    public void recalculateTotalPrice(List<OrderItem> items) {
+        this.totalPrice = items.stream()
+                .filter(item -> item.getItemQuantity() > 0)
+                .mapToInt(item -> item.getItemPrice() * item.getItemQuantity())
+                .sum();
+    }
+
+    public static Order create(
+            String email,
+            String address,
+            String postalCode,
+            int totalPrice,
+            String orderNumber
+    ){
+        return new Order(
+                null,
+                email,
+                address,
+                postalCode,
+                PostStatus.READY,
+                totalPrice,
+                orderNumber,
+                null
+        );
     }
 
 }
