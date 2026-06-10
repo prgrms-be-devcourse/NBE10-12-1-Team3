@@ -25,13 +25,13 @@ public class OrderSpecification {
 
         if (email != null && !email.isBlank()) {
             spec = spec.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.like(root.get("email"), "%" + email + "%")
+                    criteriaBuilder.like(root.get("email"),  email + "%")
             );
         }
 
         if (orderNumber != null && !orderNumber.isBlank()) {
             spec = spec.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.like(root.get("orderNumber"), "%" + orderNumber + "%")
+                    criteriaBuilder.like(root.get("orderNumber"), orderNumber + "%")
             );
         }
 
