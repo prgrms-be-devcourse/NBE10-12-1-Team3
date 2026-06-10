@@ -109,6 +109,7 @@ export function getAdminOrders(params: {
   page: number;
   size: number;
   sort?: string;
+  sortBy?: string;
   postStatus?: string;
   email?: string;
   orderNumber?: string;

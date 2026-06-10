@@ -26,7 +26,8 @@ export default function AdminOrderTable() {
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [totalElements, setTotalElements] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-  const [sort, setSort] = useState(() => searchParams.get("sort") ?? "");
+  const [sortBy, setSortBy] = useState(() => searchParams.get("sortBy") ?? "createdAt");
+  const [sortDir, setSortDir] = useState(() => searchParams.get("sort") ?? "desc");
   const [postStatus, setPostStatus] = useState(() => searchParams.get("postStatus") ?? "");
   const [searchType, setSearchType] = useState<"email" | "orderNumber">(() =>
     searchParams.get("orderNumber") ? "orderNumber" : "email"
@@ -41,7 +42,8 @@ export default function AdminOrderTable() {
     const params: Parameters<typeof getAdminOrders>[0] = {
       page: page - 1,
       size: 10,
-      sort,
+      sort: sortDir,
+      sortBy,
     };
     if (postStatus) params.postStatus = postStatus;
     const trimmed = keyword.trim();
@@ -53,13 +55,14 @@ export default function AdminOrderTable() {
     setOrders(data.orders);
     setTotalElements(data.totalElements);
     setTotalPages(data.totalPages);
-  }, [page, sort, postStatus, keyword, searchType]);
+  }, [page, sortBy, sortDir, postStatus, keyword, searchType]);
 
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
 
   useEffect(() => {
     const params = new URLSearchParams();
-    if (sort) params.set("sort", sort);
+    params.set("sort", sortDir);
+    params.set("sortBy", sortBy);
     if (postStatus) params.set("postStatus", postStatus);
     if (keyword) {
       if (searchType === "email") params.set("email", keyword.trim());
@@ -68,7 +71,7 @@ export default function AdminOrderTable() {
     if (page > 1) params.set("page", String(page));
     const query = params.toString();
     router.replace(`/admin/orders${query ? `?${query}` : ""}`);
-  }, [sort, postStatus, keyword, searchType, page, router]);
+  }, [sortBy, sortDir, postStatus, keyword, searchType, page, router]);
 
   const totalByItem: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0 };
   for (const order of orders) {
@@ -97,24 +100,33 @@ export default function AdminOrderTable() {
   return (
     <div>
       <div className="flex items-center gap-3 py-4">
-        <select
-          value={sort}
-          onChange={(e) => { setSort(e.target.value); setPage(1); }}
-          className="border rounded-lg px-3 py-2 text-sm bg-white"
-        >
-          <option value="">정렬</option>
-          <option value="createdAt">날짜</option>
-          <option value="orderNumber">주문번호</option>
-        </select>
+        <div className="flex border rounded-lg bg-white overflow-hidden">
+          <select
+            value={sortBy}
+            onChange={(e) => { setSortBy(e.target.value); setPage(1); }}
+            className="px-3 py-2 text-sm border-r bg-white focus:outline-none"
+          >
+            <option value="createdAt">주문일</option>
+            <option value="orderNumber">주문번호</option>
+          </select>
+          <select
+            value={sortDir}
+            onChange={(e) => { setSortDir(e.target.value); setPage(1); }}
+            className="px-3 py-2 text-sm bg-white focus:outline-none"
+          >
+            <option value="desc">내림차순</option>
+            <option value="asc">오름차순</option>
+          </select>
+        </div>
         <select
           value={postStatus}
           onChange={(e) => { setPostStatus(e.target.value); setPage(1); }}
           className="border rounded-lg px-3 py-2 text-sm bg-white"
         >
           <option value="">발송여부</option>
-          <option value="ready">READY</option>
-          <option value="shipped">SHIPPED</option>
-          <option value="cancelled">CANCELLED</option>
+          <option value="ready">발송 전</option>
+          <option value="shipped">발송완료</option>
+          <option value="cancelled">취소완료</option>
         </select>
         <div className="flex-1 flex justify-end gap-2">
           <div className="flex border rounded-lg bg-white overflow-hidden">
@@ -163,7 +175,7 @@ export default function AdminOrderTable() {
             <tr className="border-b text-left text-muted-foreground">
               <th className="p-2">발송여부</th>
               <th className="p-2">주문번호</th>
-              <th className="p-2 whitespace-nowrap">날짜</th>
+              <th className="p-2 whitespace-nowrap">주문일</th>
               <th className="p-2">주문자</th>
               {PRODUCT_NAMES.map((name) => (
                 <th key={name} className="p-2 text-center">{name}</th>
