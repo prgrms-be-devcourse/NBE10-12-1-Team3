@@ -38,6 +38,7 @@ export default function OrdersPage() {
   const [patchSuccessOpen, setPatchSuccessOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [hasZeroOrder, setHasZeroOrder] = useState(false);
+  const [patchCount, setPatchCount] = useState(0);
 
   async function fetchOrders() {
     const data = await searchOrders(email);
@@ -64,11 +65,16 @@ export default function OrdersPage() {
 
   async function handleDelete() {
     if (!selectedOrderId) return;
-    await deleteOrder(selectedOrderId);
-    setSelectedOrderId(null);
-    setItemChanges([]);
-    setDeleteOpen(false);
-    await fetchOrders();
+    try {
+      await deleteOrder(selectedOrderId);
+      setSelectedOrderId(null);
+      setItemChanges([]);
+      setDeleteOpen(false);
+      await fetchOrders();
+    } catch (err) {
+      setDeleteOpen(false);
+      alert(`삭제 중 오류가 발생했습니다: ${err instanceof Error ? err.message : err}`);
+    }
   }
 
   async function handlePatch() {
@@ -86,6 +92,7 @@ export default function OrdersPage() {
       });
       setItemChanges([]);
       await fetchOrders();
+      setPatchCount((c) => c + 1);
       setPatchSuccessOpen(true);
     } catch {
       setShippedOpen(true);
@@ -138,6 +145,7 @@ export default function OrdersPage() {
             onSelectionChange={setSelectedOrderId}
             onItemChange={setItemChanges}
             onZeroOrderChange={setHasZeroOrder}
+            resetSignal={patchCount}
           />
           <div className="mt-4 flex justify-end gap-2">
               <Dialog.Root open={deleteOpen} onOpenChange={setDeleteOpen}>

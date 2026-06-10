@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { AdminOrder } from "@/lib/api";
 import { BADGE_COLORS, PRODUCT_NAMES } from "@/lib/constants";
 
@@ -16,6 +16,7 @@ interface Props {
   onSelectionChange?: (orderId: number | null) => void;
   onItemChange?: (changes: ItemChangeRecord[]) => void;
   onZeroOrderChange?: (hasZeroOrder: boolean) => void;
+  resetSignal?: number;
 }
 
 const STATUS_LABEL: Record<string, string> = {
@@ -35,10 +36,16 @@ function formatDate(iso: string) {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
-export default function OrderTable({ orders, onSelectionChange, onItemChange, onZeroOrderChange }: Props) {
+export default function OrderTable({ orders, onSelectionChange, onItemChange, onZeroOrderChange, resetSignal }: Props) {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [localQty, setLocalQty] = useState<Record<string, number>>({});
   const [changesMap, setChangesMap] = useState<Record<string, ItemChangeRecord>>({});
+
+  useEffect(() => {
+    if (resetSignal === undefined || resetSignal === 0) return;
+    setLocalQty({});
+    setChangesMap({});
+  }, [resetSignal]);
 
   function getQty(orderId: number, itemId: number, original: number) {
     const key = `${orderId}-${itemId}`;
