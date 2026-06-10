@@ -59,7 +59,7 @@ export function getProductDetail(
 }
 
 export function postOrder(body: {
-  info: { email: string; address: string; postalAddress: string };
+  info: { email: string; address: string; postalCode: string };
   orders: { productId: number; quantity: number }[];
   totalPrice: number;
 }): Promise<{ orderNumber: number }> {

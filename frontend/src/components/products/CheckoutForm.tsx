@@ -10,7 +10,7 @@ interface Props {
   onCheckout: (info: {
     email: string;
     address: string;
-    postalAddress: string;
+    postalCode: string;
   }) => Promise<void>;
 }
 
@@ -21,21 +21,21 @@ function isValidEmail(value: string) {
 export default function CheckoutForm({ cart, totalPrice, onCheckout }: Props) {
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
-  const [postalAddress, setPostalAddress] = useState("");
-  const [touched, setTouched] = useState({ email: false, address: false, postalAddress: false });
+  const [postalCode, setPostalAddress] = useState("");
+  const [touched, setTouched] = useState({ email: false, address: false, postalCode: false });
   const [loading, setLoading] = useState(false);
 
   const emailError = touched.email && email.length > 0 && !isValidEmail(email)
     ? "이메일 형식이 올바르지 않습니다." : "";
   const addressError = touched.address && address.length === 0
     ? "주소를 입력해주세요." : "";
-  const postalError = touched.postalAddress && postalAddress.length > 0 && !/^\d{5}$/.test(postalAddress)
+  const postalError = touched.postalCode && postalCode.length > 0 && !/^\d{5}$/.test(postalCode)
     ? "숫자 5자리로 입력해주세요." : "";
 
   const isValid =
     isValidEmail(email) &&
     address.length > 0 &&
-    /^\d{5}$/.test(postalAddress);
+    /^\d{5}$/.test(postalCode);
 
   function blur(field: keyof typeof touched) {
     setTouched((prev) => ({ ...prev, [field]: true }));
@@ -44,7 +44,7 @@ export default function CheckoutForm({ cart, totalPrice, onCheckout }: Props) {
   async function handleSubmit() {
     setLoading(true);
     try {
-      await onCheckout({ email, address, postalAddress });
+      await onCheckout({ email, address, postalCode });
     } finally {
       setLoading(false);
     }
@@ -96,9 +96,9 @@ export default function CheckoutForm({ cart, totalPrice, onCheckout }: Props) {
           <input
             type="text"
             placeholder="우편번호"
-            value={postalAddress}
+            value={postalCode}
             onChange={(e) => setPostalAddress(e.target.value)}
-            onBlur={() => blur("postalAddress")}
+            onBlur={() => blur("postalCode")}
             className={`${inputBase} ${postalError ? inputError : ""}`}
           />
           {postalError && <p className="mt-1 text-xs text-red-500">{postalError}</p>}

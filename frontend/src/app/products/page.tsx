@@ -86,7 +86,7 @@ export default function ProductsPage() {
   async function handleCheckout(info: {
     email: string;
     address: string;
-    postalAddress: string;
+    postalCode: string;
   }) {
     const result = await postOrder({
       info,
