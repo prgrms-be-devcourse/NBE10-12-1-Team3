@@ -19,26 +19,24 @@ export default function CartSummary({
 }: Props) {
   return (
     <div className="p-6 flex flex-col h-full">
+      <h2 className="text-lg font-semibold mb-2">Cart</h2>
+      <hr className="mb-4" />
       {hoveredProduct ? (
         <div className="flex-1 overflow-hidden">
           <ProductQuickView productId={hoveredProduct.productId} />
         </div>
       ) : (
-        <>
-          <h2 className="text-lg font-semibold mb-2">Cart</h2>
-          <hr className="mb-4" />
-          <div className="flex-1 overflow-y-auto space-y-2">
-            {cart.map((item) => (
-              <div
-                key={item.product.productId}
-                className="flex justify-between text-sm"
-              >
-                <span>{item.product.productName}</span>
-                <span>{item.quantity}개</span>
-              </div>
-            ))}
-          </div>
-        </>
+        <div className="flex-1 overflow-y-auto space-y-2">
+          {cart.map((item) => (
+            <div
+              key={item.product.productId}
+              className="flex justify-between text-sm"
+            >
+              <span>{item.product.productName}</span>
+              <span>{item.quantity}개</span>
+            </div>
+          ))}
+        </div>
       )}
       <div className="mt-4 pt-4 border-t shrink-0">
         <p className="text-xs text-muted-foreground mb-3">{STRING_B}</p>
