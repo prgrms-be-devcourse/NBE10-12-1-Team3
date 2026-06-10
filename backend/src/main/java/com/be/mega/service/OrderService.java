@@ -76,7 +76,6 @@ public class OrderService {
 
     private void updateOrderItems(List<OrderItem> items, List<OrderItemUpdateRequest.OrderItemRequest> itemRequests) {
         itemRequests.stream()
-                .filter(req -> req.quantity() > 0)
                 .forEach(itemRequest ->
                         items.stream()
                                 .filter(item -> item.getId().equals(itemRequest.orderItemId()))

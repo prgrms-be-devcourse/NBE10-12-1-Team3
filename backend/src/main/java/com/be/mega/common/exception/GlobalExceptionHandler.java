@@ -5,6 +5,7 @@ import com.be.mega.common.apiResponse.ErrorCode;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -153,11 +154,15 @@ public class GlobalExceptionHandler {
             MethodArgumentNotValidException e
     ) {
         log.warn("MethodArgumentNotValidException", e);
+
+        List<String> errorMessages = e.getBindingResult()
+                .getAllErrors()
+                .stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .toList();
+
         return ResponseEntity.badRequest()
-                .body(
-                        CustomApiResponse.fail(
-                                ErrorCode.PARAMETER_INVALID,
-                                List.of("수량은 0 이상이어야 합니다.", "모든 주문 항목의 수량이 0입니다.")));
+                .body(CustomApiResponse.fail(ErrorCode.PARAMETER_INVALID, errorMessages));
     }
 
 }

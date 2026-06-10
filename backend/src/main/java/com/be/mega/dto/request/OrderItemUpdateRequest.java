@@ -20,9 +20,11 @@ public record OrderItemUpdateRequest(
         @AssertTrue(message = "모든 주문 항목의 수량이 0입니다.")
         public boolean isValidQuantities() {
             if (orderItems == null) return true;
+            boolean hasNegative = orderItems.stream()
+                    .anyMatch(item -> item.quantity() < 0);
+            if (hasNegative) return true;
             return orderItems.stream()
-                    .mapToInt(OrderItemRequest::quantity)
-                    .sum() > 0;
+                    .anyMatch(item -> item.quantity() > 0);
         }
     }
 
