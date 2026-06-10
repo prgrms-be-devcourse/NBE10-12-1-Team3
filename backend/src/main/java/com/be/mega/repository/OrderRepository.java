@@ -15,7 +15,7 @@ public interface OrderRepository extends JpaRepository<Order,Long> {
 
     @Modifying(clearAutomatically = true)
     @Query("UPDATE Order ord SET ord.postStatus = :newStatus WHERE ord.createdAt >= :start AND ord.createdAt < :end AND ord.postStatus = :currentStatus")
-    void bulkUpdateStatusInRange(
+    int bulkUpdateStatusInRange(
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end,
             @Param("currentStatus") PostStatus currentStatus,

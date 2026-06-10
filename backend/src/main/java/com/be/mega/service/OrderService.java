@@ -1,5 +1,7 @@
 package com.be.mega.service;
 
+import com.be.mega.common.apiResponse.ErrorCode;
+import com.be.mega.common.exception.MegaException;
 import com.be.mega.entity.enums.PostStatus;
 import com.be.mega.repository.OrderRepository;
 import jakarta.transaction.Transactional;
@@ -18,6 +20,15 @@ public class OrderService {
     public void markOrderAsDelivered() {
         LocalDateTime start = LocalDateTime.now().minusDays(1).withHour(14).truncatedTo(ChronoUnit.HOURS);
         LocalDateTime end = LocalDateTime.now().withHour(14).truncatedTo(ChronoUnit.HOURS);
-        orderRepository.bulkUpdateStatusInRange(start, end, PostStatus.READY, PostStatus.DELIVERED);
+        int updated;
+        try {
+            updated = orderRepository.bulkUpdateStatusInRange(start, end, PostStatus.READY, PostStatus.DELIVERED);
+        } catch (Exception e) {
+            throw new MegaException(ErrorCode.ORDER_UPDATE_FAILED);
+        }
+
+        if (updated == 0) {
+            throw new MegaException(ErrorCode.ORDER_NO_TARGET);
+        }
     }
 }
