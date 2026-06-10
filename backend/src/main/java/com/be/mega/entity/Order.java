@@ -28,7 +28,7 @@ public class Order extends BaseEntity {
     private String address;
 
     @Column(name = "postal_code", nullable = false)
-    private int postalCode;
+    private String postalCode;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "post_status", nullable = false)
@@ -59,6 +59,25 @@ public class Order extends BaseEntity {
                 .filter(item -> item.getItemQuantity() > 0)
                 .mapToInt(item -> item.getItemPrice() * item.getItemQuantity())
                 .sum();
+    }
+
+    public static Order create(
+            String email,
+            String address,
+            String postalCode,
+            int totalPrice,
+            String orderNumber
+    ){
+        return new Order(
+                null,
+                email,
+                address,
+                postalCode,
+                PostStatus.READY,
+                totalPrice,
+                orderNumber,
+                null
+        );
     }
 
 }

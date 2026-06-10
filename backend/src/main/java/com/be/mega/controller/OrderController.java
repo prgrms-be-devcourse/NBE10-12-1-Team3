@@ -1,8 +1,10 @@
 package com.be.mega.controller;
 
 import com.be.mega.common.apiResponse.CustomApiResponse;
+import com.be.mega.dto.request.OrderCreateRequest;
 import com.be.mega.dto.request.OrderItemUpdateRequest;
 import com.be.mega.dto.request.OrderSearchRequest;
+import com.be.mega.dto.response.OrderCreateResponse;
 import com.be.mega.dto.response.OrderItemUpdateResponse;
 import com.be.mega.dto.response.OrderSearchResponse;
 import com.be.mega.service.OrderService;
@@ -42,4 +44,15 @@ public class OrderController {
         orderService.deleteOrder(orderId);
         return CustomApiResponse.success(null, 200, "주문이 삭제되었습니다.");
     }
+    @Operation(summary = "주문 요청")
+    @PostMapping
+    public CustomApiResponse<OrderCreateResponse> createOrder(
+            @Valid @RequestBody OrderCreateRequest request
+    ) {
+        OrderCreateResponse response = orderService.createOrder(request);
+
+        return CustomApiResponse.success(response, 201, "결제 요청이 성공했습니다.");
+
+    }
+
 }

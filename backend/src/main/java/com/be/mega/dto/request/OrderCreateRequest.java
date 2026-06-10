@@ -21,11 +21,13 @@ public record OrderCreateRequest(
             @Email(message = "올바른 이메일 형식이 아닙니다.")
             @NotBlank(message = "이메일을 반드시 입력해주세요.")
             String email,
+
             @NotBlank(message = "주소를 반드시 입력해주세요.")
             String address,
+
             @NotBlank(message = "우편번호를 반드시 입력해주세요.")
             @Pattern(regexp = "\\d{5}", message = "우편번호는 5자리 숫자여야 합니다.")
-            String postalAddress
+            String postalCode
     ) {
     }
 
