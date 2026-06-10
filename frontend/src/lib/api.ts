@@ -113,7 +113,7 @@ export function getAdminOrders(params: {
   postStatus?: string;
   email?: string;
   orderNumber?: string;
-}): Promise<{ orders: AdminOrder[]; totalElements: number; totalPages: number }> {
+}): Promise<{ orders: AdminOrder[]; totalElements: number; totalPages?: number }> {
   const query = new URLSearchParams(
     Object.entries(params)
       .filter(([, v]) => v !== undefined && v !== "")
