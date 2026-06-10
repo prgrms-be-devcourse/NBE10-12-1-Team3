@@ -23,7 +23,7 @@ export interface AdminOrder {
   updatedAt: string;
   deletedAt: string | null;
   postStatus: string;
-  orderNumber: number;
+  orderNumber: string;
   email: string;
   totalPrice: number;
   orderItems: OrderItem[];

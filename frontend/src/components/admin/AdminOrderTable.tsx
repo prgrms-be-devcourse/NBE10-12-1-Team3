@@ -9,7 +9,7 @@ import ShippingResultModal from "./ShippingResultModal";
 
 const STATUS_LABEL: Record<string, string> = {
   READY: "발송전",
-  SHIPPED: "발송완료",
+  DELIVERED: "발송완료",
   CANCELLED: "취소됨",
 };
 
@@ -124,9 +124,9 @@ export default function AdminOrderTable() {
           className="border rounded-lg px-3 py-2 text-sm bg-white"
         >
           <option value="">발송여부</option>
-          <option value="ready">발송 전</option>
-          <option value="shipped">발송완료</option>
-          <option value="cancelled">취소완료</option>
+          <option value="READY">발송 전</option>
+          <option value="DELIVERED">발송완료</option>
+          <option value="CANCELLED">취소완료</option>
         </select>
         <div className="flex-1 flex justify-end gap-2">
           <div className="flex border rounded-lg bg-white overflow-hidden">
