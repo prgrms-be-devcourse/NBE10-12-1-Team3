@@ -78,6 +78,7 @@ export default function AdminOrderTable() {
 
   const totalByItem: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0 };
   for (const order of orders) {
+    if (order.postStatus === "CANCELLED") continue;
     for (const item of order.orderItems) {
       if (item.itemId in totalByItem) totalByItem[item.itemId] += item.quantity;
     }
@@ -165,7 +166,7 @@ export default function AdminOrderTable() {
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-amber-50 border-b">
-              <th colSpan={5} className="p-2 text-left font-medium">
+              <th colSpan={4} className="p-2 text-left font-medium">
                 총 주문 {totalElements}건
               </th>
               {[1, 2, 3, 4].map((itemId, i) => (
@@ -173,7 +174,7 @@ export default function AdminOrderTable() {
                   {PRODUCT_NAMES[i]}: {totalByItem[itemId]}개
                 </th>
               ))}
-              <th className="p-2" />
+              <th className="p-2 text-xs font-normal text-muted-foreground text-right">(이 페이지의 품목 수)</th>
             </tr>
             <tr className="border-b text-left text-muted-foreground">
               <th className="p-2">발송여부</th>
@@ -205,10 +206,12 @@ export default function AdminOrderTable() {
                 <td className="p-2 whitespace-nowrap">{formatDate(order.createdAt)}</td>
                 <td className="p-2">{order.email}</td>
                 {[1, 2, 3, 4].map((itemId) => {
-                  const orderItem = order.orderItems.find((i) => i.itemId === itemId);
+                  const qty = order.orderItems
+                    .filter((i) => i.itemId === itemId)
+                    .reduce((sum, i) => sum + i.quantity, 0);
                   return (
                     <td key={itemId} className="p-2 text-center">
-                      {orderItem ? orderItem.quantity : <span className="text-muted-foreground">-</span>}
+                      {qty > 0 ? qty : <span className="text-muted-foreground">-</span>}
                     </td>
                   );
                 })}
